@@ -1,117 +1,158 @@
 <h1 align="center">🧵 Orbit Thread</h1>
-<p align="center"><strong>Pick up where you left off. Not where the chat ended.</strong></p>
-<p align="center">Lightweight project context, verified handoffs and fresh-session recovery for <strong>Codex</strong> and <strong>Claude Code</strong>.</p>
+
+<p align="center"><strong>Pick up where you left off. Know what to do next.</strong></p>
+
+<p align="center">Lean coding-session continuity for <strong>Codex</strong> and <strong>Claude Code</strong>, plus optional, read-only GitHub intelligence through <strong>Orbit Next MCP</strong>.</p>
+
 <p align="center">
   <a href="https://www.npmjs.com/package/orbit-thread"><img alt="npm version" src="https://img.shields.io/npm/v/orbit-thread?label=npm"></a>
-  <a href="https://github.com/shab1h-gh/orbit-thread/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/shab1h-gh/orbit-thread/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/shab1h-gh/orbit-thread/actions/workflows/ci.yml"><img alt="CI status" src="https://github.com/shab1h-gh/orbit-thread/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/shab1h-gh/orbit-thread/releases/tag/v1.3.0"><img alt="Release v1.3.0" src="https://img.shields.io/badge/release-v1.3.0-4338CA"></a>
+  <a href="https://mcp.orbit.convio.io/health"><img alt="Orbit Next MCP live" src="https://img.shields.io/badge/MCP-live-16A34A"></a>
   <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-blue.svg"></a>
 </p>
-<p align="center"><a href="#quick-start"><strong>Quick start</strong></a> · <a href="#orbit-next-remote-github-intelligence">Orbit Next</a> · <a href="#how-it-works">How it works</a> · <a href="#orbit-resume-starting-a-fresh-session">Orbit Resume</a> · <a href="#command-reference">Commands</a> · <a href="#troubleshooting">Troubleshooting</a></p>
+
+<p align="center">
+  <a href="#quick-start"><strong>Quick start</strong></a> ·
+  <a href="#orbit-next-remote-github-intelligence">Orbit Next MCP</a> ·
+  <a href="#how-it-works">How it works</a> ·
+  <a href="#handoff-and-resume">Handoff &amp; Resume</a> ·
+  <a href="#command-reference">CLI commands</a> ·
+  <a href="#troubleshooting">FAQ</a>
+</p>
 
 ---
 
-Orbit Thread prepares small living docs, captures meaningful progress and helps your next coding session recover only the context it needs. **Your repository and Git remain the source of truth.** There is no hosted memory account or giant session diary.
+## A complete workflow, without the context bloat
 
-### Three skills, one workflow
+Orbit Thread keeps durable project knowledge in your repository and short-lived execution context in a local, Git-ignored handoff. **Git and current project files stay authoritative.** Orbit Next adds an *optional*, separate service for analysing **public GitHub repositories**.
 
-| Skill | What it does | When to use it |
+| Capability | What you get | Where it runs |
 | :--- | :--- | :--- |
-| 🧭 **[Orbit Setup](#what-setup-creates)** | Prepares project docs, agent instructions and subagent preferences without replacing existing knowledge. | Starting or onboarding a project. |
-| 💾 **[Handoff](#when-to-save-a-handoff)** | Writes a concise, verified checkpoint to `HANDOFF-STATE.md`. | After meaningful milestones or before a fresh chat. |
-| ▶️ **[Orbit Resume](#orbit-resume-starting-a-fresh-session)** | Recovers progress, open tasks and the next action from the handoff and read-only repository evidence. | Once at the start of a new coding conversation. |
+| 🧭 **[Orbit Setup](#what-setup-creates)** | Lightweight living docs, agent instructions and bounded-subagent preferences. | Local |
+| 💾 **[Handoff](#when-to-save-a-handoff)** | A verified, overwrite-only checkpoint in `HANDOFF-STATE.md` (maximum 50 lines). | Local |
+| ▶️ **[Orbit Resume](#orbit-resume-starting-a-fresh-session)** | A fresh-session starting point from handoff, current Git state and relevant docs. | Local, read-only |
+| 🔎 **[Orbit Next MCP](#orbit-next-remote-github-intelligence)** | Source-backed next actions, CI-failure investigation and release-readiness checks. | Remote, read-only |
 
-## Orbit Next: remote GitHub intelligence
-
-**Orbit Next** (new in v1.3.0) is an optional, read-only [MCP](https://modelcontextprotocol.io) server that looks at a **public GitHub repository** and tells your coding agent what is blocking progress. It never writes anything, never needs your code, and never uses an AI model: every result comes from deterministic rules over GitHub's public metadata.
-
-| Tool | Answers | Inputs |
-| :--- | :--- | :--- |
-| `get_project_next_actions` | What should happen next? Prioritised actions from recent commits, open PRs and issues, CI on the default branch and `ROADMAP.md`, each with severity, rationale, source URLs and a **verified / heuristic** label. Gaps are listed as **unknowns**. | `owner`, `repo` |
-| `diagnose_ci_failure` | Why is CI red? Failed jobs and steps, bounded and sanitised check annotations, and heuristic areas to investigate. It **never claims a root cause**. | `owner`, `repo`, optional `run_id` (default: latest failed run on the default branch) |
-| `assess_release_readiness` | Is it technically ready to release? `PASS` / `WARN` / `BLOCKED` / `UNKNOWN` for repository state, CI, open PRs, version consistency across manifests, changelog entry and existing tags. | `owner`, `repo` |
-
-> [!IMPORTANT]
-> **Local Resume and remote Orbit Next are different things.** Resume reads your local `HANDOFF-STATE.md` and Git state and sends nothing anywhere. Orbit Next runs on a Cloudflare Worker and only fetches public GitHub data about the `owner/repo` you name. It cannot see local files, uncommitted changes, private repositories or `HANDOFF-STATE.md`. Release readiness is **technical** evidence only: human approval and publication are always reported as not determined or not performed.
-
-### Example (illustrative output, abridged)
-
-```text
-You:    Is shab1h-gh/orbit-thread ready to release?
-Agent:  (calls assess_release_readiness {"owner":"shab1h-gh","repo":"orbit-thread"})
-        → technicalReadiness: WARN
-          ci PASS · open_prs PASS · version_consistency PASS (1.2.2) · changelog PASS
-          tags WARN (v1.2.2 already exists: bump the version for a new release)
-          humanApproval UNKNOWN · publication NOT_PERFORMED
-```
-
-```text
-You:    Why did CI fail on my repo?
-Agent:  (calls diagnose_ci_failure {"owner":"you","repo":"app"})
-        → failed job "test (ubuntu)", step "Run npm test", annotation src/a.test.ts:9
-          investigate (heuristic): "Test step failed: inspect the failing test output…"
-          rootCause: not determined · logs need authentication and are not read
-```
-
-### Connect
-
-The plugin ships a portable MCP configuration (`plugin/mcp.json`) and a Claude Code one (`plugin/.mcp.json`), server name `orbit-next`; the Claude one reads the endpoint from the `ORBIT_NEXT_URL` environment variable. **No public endpoint has been published yet** (see [Status](#status-and-costs)); until then run your own (below) and point at it:
-
-```bash
-export ORBIT_NEXT_URL="https://<your-worker-host>/mcp"
-# Claude Code, without the plugin:
-claude mcp add --transport http orbit-next "$ORBIT_NEXT_URL"
-```
-
-For Codex or any other Streamable HTTP MCP client, add a server of type HTTP with the same URL. The Orbit Thread skills (Setup, Handoff, Resume) work with or without Orbit Next.
-
-### Run your own endpoint
-
-The Worker lives in [`worker/`](worker) with its own `package.json`, so the npm CLI keeps zero dependencies.
-
-```bash
-cd worker
-npm ci --ignore-scripts
-npm test                       # mocked-GitHub tests, real MCP client included
-npx wrangler deploy --env staging   # needs your own Cloudflare login
-node scripts/e2e.mjs https://<your-worker-host>/mcp   # end-to-end check
-```
-
-### Status and costs
-
-- **Costs:** none for users. The Worker uses no paid AI APIs, database or storage; it runs on Cloudflare's free tier for modest traffic.
-- **GitHub rate limits:** you never supply credentials. By default the Worker calls GitHub unauthenticated (60 requests/hour per IP, shared by all callers from the same Cloudflare egress). The operator can add an optional read-only, public-repositories-only token as a Cloudflare secret to raise this (5,000/hour); see [OPERATIONS](docs/OPERATIONS.md). Each call uses roughly 4–9 requests, with a 5-minute cache, bounded concurrency and a request budget. When the limit is hit the tool returns a clear rate-limit error with a retry hint, never a partial result presented as complete.
-- **Limits:** public repositories only; first page of PRs (30) and issues (50); GitHub Actions only; workflow logs need authentication and are not read; no write actions; no private data.
-- **Not included:** per-user GitHub authentication or private repositories, workflow logs, a directory listing for the MCP server.
-- **Local Resume vs Orbit Next:** `orbit-resume` and `npx orbit-thread resume` run on your machine, read your handoff and Git state and make no network calls. Orbit Next runs remotely, sees only the public `owner/repo` you pass, and cannot see local files, branches or `HANDOFF-STATE.md`.
-- **Verify an install:** `claude mcp list` should show `plugin:orbit-thread:orbit-next … Connected`. Codex: see [docs/REVIEW.md](docs/REVIEW.md#codex).
-
-Architecture and threat model: [ARCHITECTURE](docs/ARCHITECTURE.md) · [SECURITY](SECURITY.md) · [PRIVACY](PRIVACY.md).
+The three continuity skills **work without Orbit Next**. Orbit Next cannot access your local workspace, private repositories, uncommitted changes or handoff files.
 
 ## Quick start
 
-> **Run these commands from the project root.** Requires Node.js 20+ on macOS or Linux.
+> **Requirements:** Node.js 20+, macOS or Linux. Run installation commands from your project root.
+
+Install the three local skills and prepare the project:
 
 ```bash
 npx orbit-thread install
 npx orbit-thread setup
 ```
 
-Choose Codex, Claude Code or both when prompted. To skip the questions:
+Choose Codex, Claude Code or both when prompted. For a non-interactive project installation:
 
 ```bash
 npx orbit-thread install --agent both --scope project --yes
 npx orbit-thread setup --agent both --yes
 ```
 
-Once installed, call the skills in your coding agent:
+**Use the skills in your coding agent's chat**, not in Terminal:
 
-| Where you're working | Set up a project | Save a handoff | Resume a fresh chat |
-| --- | --- | --- | --- |
-| Codex | `$orbit-setup` | `$handoff` | `$orbit-resume` |
-| Claude Code | `/orbit-setup` | `/handoff` | `/orbit-resume` |
-| Claude marketplace plugin | `/orbit-thread:orbit-setup` | `/orbit-thread:handoff` | `/orbit-thread:orbit-resume` |
+| Agent | Setup | Save progress | Resume work |
+| :--- | :--- | :--- | :--- |
+| **Codex** | `$orbit-setup` | `$handoff` | `$orbit-resume` |
+| **Claude Code** | `/orbit-setup` | `/handoff` | `/orbit-resume` |
+| **Claude marketplace plugin** | `/orbit-thread:orbit-setup` | `/orbit-thread:handoff` | `/orbit-thread:orbit-resume` |
 
-The commands in the table are **skill invocations in your coding agent's chat**, not Terminal commands. The agent can also save a handoff after a verified milestone, where its host supports automatic skill invocation.
+**Want public GitHub analysis too?** Connect [Orbit Next](#connect-orbit-next-to-your-agent). It requires no GitHub login or token from you.
+
+## Orbit Next: remote GitHub intelligence
+
+**Live in v1.3.0:** [`https://mcp.orbit.convio.io/mcp`](https://mcp.orbit.convio.io/mcp) · [Health](https://mcp.orbit.convio.io/health) · [Release](https://github.com/shab1h-gh/orbit-thread/releases/tag/v1.3.0)
+
+Orbit Next is a stateless, [Streamable HTTP MCP](https://modelcontextprotocol.io) server running on Cloudflare Workers. It reads **public GitHub metadata only**, applies deterministic rules and returns evidence with links. It doesn't use an AI API, require user credentials or perform GitHub write actions.
+
+### Three tools, each read-only
+
+| Tool | Question it answers | Evidence & limits |
+| :--- | :--- | :--- |
+| **`get_project_next_actions`** | What should I work on next? | Prioritised actions from recent commits, issues, PRs, default-branch CI and `ROADMAP.md`, with severity, links and `verified` / `heuristic` labels. Missing evidence appears as `unknowns`. |
+| **`diagnose_ci_failure`** | What failed in GitHub Actions? | Failed jobs, steps and bounded sanitised annotations. The optional `run_id` selects a run; otherwise it checks the latest failed run on the default branch. **Root cause is not assumed.** |
+| **`assess_release_readiness`** | Is this repository technically ready for release? | `PASS` / `WARN` / `BLOCKED` / `UNKNOWN` for CI, PRs, manifest versions, changelog and existing tags. Human approval and publication remain outside the tool's remit. |
+
+All three take `owner` and `repo`. `diagnose_ci_failure` also accepts an optional positive integer `run_id`.
+
+### Connect Orbit Next to your agent
+
+**Claude Code — install the GitHub-hosted plugin**, which bundles Setup, Handoff, Resume and the Orbit Next MCP configuration:
+
+```bash
+claude plugin marketplace add shab1h-gh/orbit-thread
+claude plugin install orbit-thread@orbit-thread
+claude mcp list
+```
+
+In Claude Code's chat, the equivalent installation commands begin with `/plugin`; see [installation options](#claude-github-marketplace). The list should show an `orbit-next` connection. The bundled `plugin/.mcp.json` supports an `ORBIT_NEXT_URL` override for development or self-hosting.
+
+**Codex CLI — connect to the same production server:**
+
+```bash
+codex mcp add orbit-next --url https://mcp.orbit.convio.io/mcp
+codex mcp list
+```
+
+This **direct MCP connection and all three tool calls were verified in Codex CLI**. Installing the *combined portable plugin ZIP* in Codex has **not** been tested. Installing the local skills with `npx orbit-thread install` is a separate step.
+
+**Other Streamable HTTP MCP clients:** Add a remote MCP server named `orbit-next` with URL `https://mcp.orbit.convio.io/mcp`. The endpoint is an MCP protocol endpoint, not a website to browse.
+
+### Try it with a real public repository
+
+Ask your connected agent:
+
+> Using Orbit Next, assess release readiness and identify the next actions for `shab1h-gh/orbit-thread`. Label verified facts, heuristics and unknowns, and include GitHub source links. Don't change anything.
+
+Or investigate a **known failed CI run**:
+
+> Using Orbit Next, diagnose `cli/cli` GitHub Actions run `37915254425`. Identify the failed job and step, and distinguish evidence from any unconfirmed root cause.
+
+In the verified CI example, the tool found a failed `govulncheck` job and **Check Go vulnerabilities** step; it did **not** invent a root cause. See the [GitHub Actions run](https://github.com/cli/cli/actions/runs/37915254425) and [review evidence](docs/REVIEW.md#codex).
+
+> [!NOTE]
+> Results depend on the repository's **current** public GitHub state. For example, a release-readiness `WARN` can be correct when the requested version is **already tagged and published**. It does not mean the existing release failed.
+
+### Local skills vs remote MCP
+
+| | Setup, Handoff & Resume | Orbit Next |
+| :--- | :--- | :--- |
+| Data read | Local Git state, relevant project docs and local handoff | Requested public GitHub repository, issues, PRs, Actions metadata |
+| Network during execution | None from the skills (installation via npm may use network) | HTTPS to the Worker and public GitHub endpoints |
+| Can edit your project? | Setup and Handoff intentionally create/update local files; Resume is read-only | **No** |
+| Credentials from users | None | None |
+| Storage | Local project files | No database or persistent user records; public GitHub responses may be edge-cached for five minutes |
+
+### Availability, security & limits
+
+- **Public repos only.** No private repository access, GitHub mutations, private workflow logs or local file access.
+- **Bounded lookups.** First-page PR/issue results, GitHub Actions CI, per-call request budgets and timeouts. Evidence is labelled; gaps are not silently filled.
+- **Rate limits.** Cloudflare allows 30 requests per minute per IP; GitHub imposes its own quota. The service operator has configured an optional public-repositories-only GitHub token to raise the upstream limit. **Users never need to provide credentials.**
+- **No inference charges or user accounts.** The Worker uses deterministic checks, public data and a short public-data cache. No application database or request-body telemetry is added.
+- **Validation.** Production acceptance passed 23/23 protocol, security and functional checks; Claude Code and Codex CLI have both called the tools successfully.
+- **Directory status.** Public npm and GitHub release are available; OpenAI and Anthropic directory publication is **not** claimed. See [submission notes](docs/SUBMISSION.md).
+
+Read [Security](SECURITY.md), [Privacy](PRIVACY.md), [Architecture](docs/ARCHITECTURE.md) and [Operations](docs/OPERATIONS.md) for technical and operational detail.
+
+### Self-hosting (optional)
+
+You do **not** need your own Worker to use the live endpoint. To deploy a separate copy using your own Cloudflare account, start with the `worker/` package:
+
+```bash
+cd worker
+npm ci --ignore-scripts
+npm run typecheck
+npm test
+npx wrangler deploy --config ./wrangler.jsonc --env staging
+node scripts/e2e.mjs https://<your-staging-host>/mcp
+```
+
+Review the Worker name, environment, domain, bindings and token handling **before** deploying; do not deploy to the existing production domain. The [operations guide](docs/OPERATIONS.md) covers acceptance criteria, explicit environments, secrets and rollback.
 
 ## How it works
 
@@ -435,6 +476,27 @@ If you installed the Claude GitHub marketplace plugin, update or reinstall it fr
 
 ## Troubleshooting
 
+<details>
+<summary><strong>Orbit Next does not appear in Codex or Claude Code</strong></summary>
+
+For Codex, run `codex mcp list`. If `orbit-next` is missing, add it with `codex mcp add orbit-next --url https://mcp.orbit.convio.io/mcp`. For Claude Code, check `claude mcp list` after installing or updating the plugin from this repository. Restart the agent session if it loaded its tools before you connected the server. The local skills are installed separately with `npx orbit-thread install`.
+
+</details>
+
+<details>
+<summary><strong>Orbit Next returns a rate-limit warning or INCONCLUSIVE E2E result</strong></summary>
+
+The Cloudflare per-IP limiter and GitHub's upstream quota are separate. Slow requests or retry after the indicated interval; an E2E `INCONCLUSIVE` result is **not** a pass. The operator-managed GitHub token is a Cloudflare secret, not something users should paste into an agent prompt. See [Operations](docs/OPERATIONS.md).
+
+</details>
+
+<details>
+<summary><strong>Orbit Next cannot find my repository or read CI logs</strong></summary>
+
+Orbit Next intentionally works with **public repositories** only and reports private or missing repositories as unavailable. It uses public GitHub Actions job/step status and limited check annotations; it does **not** fetch private workflow logs or establish an unverified root cause. Provide a run ID to diagnose a particular failure.
+
+</details>
+
 
 <details>
 <summary><strong>Resume did not start automatically or the skill is missing</strong></summary>
@@ -557,9 +619,9 @@ Read [Security](SECURITY.md), [Privacy](PRIVACY.md) and [Terms of Service](TERMS
 
 ## Provider directories
 
-The repository includes a portable skills plugin ZIP for the OpenAI upload flow and a Claude plugin manifest for Anthropic and GitHub distribution.
+The [v1.3.0 release](https://github.com/shab1h-gh/orbit-thread/releases/tag/v1.3.0) includes a portable plugin ZIP with three skills and `plugin/mcp.json` (Agent Plugins 1.0), plus Claude-specific plugin metadata and `plugin/.mcp.json`. The remote MCP is already usable directly from Codex CLI and through the Claude GitHub marketplace plugin.
 
-**Submission, approval and publication are separate steps.** A working npm or GitHub installation does not establish that a plugin is publicly listed by OpenAI or Anthropic. See [directory submission notes](docs/SUBMISSION.md).
+**npm/GitHub distribution is not the same as official directory approval.** The OpenAI and Anthropic directory submissions have separate review processes and are not presented as published; see [submission preparation](docs/SUBMISSION.md).
 
 ## Contributing
 
