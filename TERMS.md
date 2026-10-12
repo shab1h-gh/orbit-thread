@@ -27,7 +27,7 @@ Orbit Thread includes safeguards for common secret patterns and accidental overw
 
 ## 4. Local processing and third-party services
 
-Orbit Thread's local scripts operate on files in your project. Orbit Thread does not operate its own data-collection service or collect telemetry. The local handoff file is designed to be ignored by Git, but you are responsible for checking what your repository or coding agent actually shares.
+Orbit Thread's local scripts operate on files in your project. Orbit Thread does not operate a data-collection service or collect telemetry. The optional Orbit Next MCP server is a stateless, read-only service that fetches public GitHub data for repositories you name; it is provided as-is, may be rate-limited or unavailable, and is described in the [Privacy Policy](PRIVACY.md). The local handoff file is designed to be ignored by Git, but you are responsible for checking what your repository or coding agent actually shares.
 
 Installing Orbit Thread, using Git hosting, or invoking Codex, Claude Code and plugin marketplaces may involve **npm, GitHub, OpenAI, Anthropic or other providers**. Their separate terms, permissions, billing arrangements and privacy practices apply to those services. Orbit Thread does not control how third-party coding agents process information you choose to provide.
 

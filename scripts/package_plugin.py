@@ -33,5 +33,7 @@ with zipfile.ZipFile(output) as archive:
     assert 'skills/handoff/SKILL.md' in names
     assert 'skills/orbit-setup/SKILL.md' in names
     assert 'skills/orbit-resume/SKILL.md' in names
+    assert '.mcp.json' in names
+    assert not any(n.startswith('worker/') or 'node_modules' in n for n in names)
 
 print(f'Built dist/{output.name} ({output.stat().st_size} bytes)')

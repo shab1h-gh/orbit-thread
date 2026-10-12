@@ -1,0 +1,63 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+
+const root = fileURLToPath(new URL('../', import.meta.url));
+const read = p => fs.readFileSync(path.join(root, p), 'utf8');
+const json = p => JSON.parse(read(p));
+
+test('plugin ships a valid, credential-free MCP configuration', () => {
+  const cfg = json('plugin/.mcp.json');
+  assert.deepEqual(Object.keys(cfg), ['mcpServers']);
+  assert.deepEqual(Object.keys(cfg.mcpServers), ['orbit-next']);
+  const s = cfg.mcpServers['orbit-next'];
+  assert.equal(s.type, 'http');
+  assert.match(s.url, /^\$\{ORBIT_NEXT_URL:-https:\/\/[^\s"]+\/mcp\}$/);
+  assert.deepEqual(Object.keys(s).sort(), ['type', 'url']);
+});
+
+test('both manifests reference the MCP config and still declare the three skills', () => {
+  assert.equal(json('plugin/plugin.json').mcpServers, './.mcp.json');
+  const claude = json('plugin/.claude-plugin/plugin.json');
+  assert.equal(claude.mcpServers, './.mcp.json');
+  assert.equal(claude.skills, './skills/');
+  for (const s of ['handoff', 'orbit-setup', 'orbit-resume']) assert.ok(fs.existsSync(path.join(root, 'plugin/skills', s, 'SKILL.md')));
+});
+
+test('the dependency-free CLI stays isolated from the MCP worker', () => {
+  const pkg = json('package.json');
+  assert.equal(pkg.dependencies, undefined);
+  assert.equal(pkg.devDependencies, undefined);
+  assert.equal(pkg.scripts.postinstall, undefined);
+  assert.ok(!pkg.files.some(f => f.startsWith('worker')));
+  const w = json('worker/package.json');
+  assert.equal(w.private, true);
+  assert.ok(w.dependencies['@modelcontextprotocol/sdk']);
+  assert.equal(w.scripts.postinstall, undefined);
+  for (const v of Object.values({ ...w.dependencies, ...w.devDependencies })) assert.match(v, /^\d/, 'worker dependencies are pinned exactly');
+});
+
+test('worker source is read-only by construction', () => {
+  const dir = path.join(root, 'worker/src');
+  for (const f of fs.readdirSync(dir)) {
+    const src = fs.readFileSync(path.join(dir, f), 'utf8');
+    assert.doesNotMatch(src, /method:\s*['"](?:POST|PUT|PATCH|DELETE)['"]/i, `${f} must not issue mutating requests`);
+    assert.doesNotMatch(src, /\bauthorization\b/i, `${f} must not send credentials`);
+    assert.doesNotMatch(src, /\beval\(|new Function\(|child_process/, `${f} must not execute retrieved content`);
+    assert.doesNotMatch(src, /HANDOFF-STATE/, `${f} must not reference the local handoff file`);
+  }
+});
+
+test('npm pack contents exclude the worker and include the MCP config', () => {
+  const r = spawnSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], { cwd: root, encoding: 'utf8' });
+  assert.equal(r.status, 0, r.stderr);
+  const parsed = JSON.parse(r.stdout);
+  const entry = Array.isArray(parsed) ? parsed[0] : parsed['orbit-thread'];
+  const files = entry.files.map(f => f.path);
+  assert.ok(files.includes('plugin/.mcp.json'));
+  assert.ok(!files.some(f => f.startsWith('worker/') || f.includes('node_modules')));
+  assert.ok(files.includes('bin/orbit-thread.mjs'));
+});

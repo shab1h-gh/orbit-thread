@@ -6,7 +6,7 @@
   <a href="https://github.com/shab1h-gh/orbit-thread/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/shab1h-gh/orbit-thread/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-blue.svg"></a>
 </p>
-<p align="center"><a href="#quick-start"><strong>Quick start</strong></a> · <a href="#how-it-works">How it works</a> · <a href="#orbit-resume-starting-a-fresh-session">Orbit Resume</a> · <a href="#command-reference">Commands</a> · <a href="#troubleshooting">Troubleshooting</a></p>
+<p align="center"><a href="#quick-start"><strong>Quick start</strong></a> · <a href="#orbit-next-remote-github-intelligence">Orbit Next</a> · <a href="#how-it-works">How it works</a> · <a href="#orbit-resume-starting-a-fresh-session">Orbit Resume</a> · <a href="#command-reference">Commands</a> · <a href="#troubleshooting">Troubleshooting</a></p>
 
 ---
 
@@ -19,6 +19,71 @@ Orbit Thread prepares small living docs, captures meaningful progress and helps 
 | 🧭 **[Orbit Setup](#what-setup-creates)** | Prepares project docs, agent instructions and subagent preferences without replacing existing knowledge. | Starting or onboarding a project. |
 | 💾 **[Handoff](#when-to-save-a-handoff)** | Writes a concise, verified checkpoint to `HANDOFF-STATE.md`. | After meaningful milestones or before a fresh chat. |
 | ▶️ **[Orbit Resume](#orbit-resume-starting-a-fresh-session)** | Recovers progress, open tasks and the next action from the handoff and read-only repository evidence. | Once at the start of a new coding conversation. |
+
+## Orbit Next: remote GitHub intelligence
+
+**Orbit Next** (new in v1.3.0) is an optional, read-only [MCP](https://modelcontextprotocol.io) server that looks at a **public GitHub repository** and tells your coding agent what is blocking progress. It never writes anything, never needs your code, and never uses an AI model: every result comes from deterministic rules over GitHub's public metadata.
+
+| Tool | Answers | Inputs |
+| :--- | :--- | :--- |
+| `get_project_next_actions` | What should happen next? Prioritised actions from recent commits, open PRs and issues, CI on the default branch and `ROADMAP.md`, each with severity, rationale, source URLs and a **verified / heuristic** label. Gaps are listed as **unknowns**. | `owner`, `repo` |
+| `diagnose_ci_failure` | Why is CI red? Failed jobs and steps, bounded and sanitised check annotations, and heuristic areas to investigate. It **never claims a root cause**. | `owner`, `repo`, optional `run_id` (default: latest failed run on the default branch) |
+| `assess_release_readiness` | Is it technically ready to release? `PASS` / `WARN` / `BLOCKED` / `UNKNOWN` for repository state, CI, open PRs, version consistency across manifests, changelog entry and existing tags. | `owner`, `repo` |
+
+> [!IMPORTANT]
+> **Local Resume and remote Orbit Next are different things.** Resume reads your local `HANDOFF-STATE.md` and Git state and sends nothing anywhere. Orbit Next runs on a Cloudflare Worker and only fetches public GitHub data about the `owner/repo` you name. It cannot see local files, uncommitted changes, private repositories or `HANDOFF-STATE.md`. Release readiness is **technical** evidence only: human approval and publication are always reported as not determined or not performed.
+
+### Example (illustrative output, abridged)
+
+```text
+You:    Is shab1h-gh/orbit-thread ready to release?
+Agent:  (calls assess_release_readiness {"owner":"shab1h-gh","repo":"orbit-thread"})
+        → technicalReadiness: WARN
+          ci PASS · open_prs PASS · version_consistency PASS (1.2.2) · changelog PASS
+          tags WARN (v1.2.2 already exists: bump the version for a new release)
+          humanApproval UNKNOWN · publication NOT_PERFORMED
+```
+
+```text
+You:    Why did CI fail on my repo?
+Agent:  (calls diagnose_ci_failure {"owner":"you","repo":"app"})
+        → failed job "test (ubuntu)", step "Run npm test", annotation src/a.test.ts:9
+          investigate (heuristic): "Test step failed: inspect the failing test output…"
+          rootCause: not determined · logs need authentication and are not read
+```
+
+### Connect
+
+The plugin ships an MCP configuration (`plugin/.mcp.json`, server name `orbit-next`) that reads the endpoint from the `ORBIT_NEXT_URL` environment variable. **No public endpoint has been published yet** (see [Status](#status-and-costs)); until then run your own (below) and point at it:
+
+```bash
+export ORBIT_NEXT_URL="https://<your-worker-host>/mcp"
+# Claude Code, without the plugin:
+claude mcp add --transport http orbit-next "$ORBIT_NEXT_URL"
+```
+
+For Codex or any other Streamable HTTP MCP client, add a server of type HTTP with the same URL. The Orbit Thread skills (Setup, Handoff, Resume) work with or without Orbit Next.
+
+### Run your own endpoint
+
+The Worker lives in [`worker/`](worker) with its own `package.json`, so the npm CLI keeps zero dependencies.
+
+```bash
+cd worker
+npm ci --ignore-scripts
+npm test                       # 90 mocked-GitHub tests, real MCP client included
+npx wrangler deploy --env staging   # needs your own Cloudflare login
+node scripts/e2e.mjs https://<your-worker-host>/mcp   # end-to-end check
+```
+
+### Status and costs
+
+- **Costs:** none for users. The Worker uses no paid AI APIs, database or storage; it runs on Cloudflare's free tier for modest traffic.
+- **GitHub rate limits:** Orbit Next sends **no credentials**, so GitHub's unauthenticated limit (60 requests/hour per IP, shared by all callers from the same Cloudflare egress) applies. Each call uses roughly 4–9 requests, with a 5-minute cache. When the limit is hit, the tool returns a clear rate-limit error with a retry hint. Expect this to bite during busy periods.
+- **Limits:** public repositories only; first page of PRs (30) and issues (50); GitHub Actions only; workflow logs need authentication and are not read; no write actions; no private data.
+- **Not included:** an authenticated mode (see [roadmap](docs/ROADMAP.md)), a published production endpoint, and any directory listing for the MCP server.
+
+Architecture and threat model: [ARCHITECTURE](docs/ARCHITECTURE.md) · [SECURITY](SECURITY.md) · [PRIVACY](PRIVACY.md).
 
 ## Quick start
 
@@ -478,7 +543,7 @@ A restricted coding environment may report a permissions error even when your Ma
 
 ## Security and privacy
 
-> 🔒 Orbit Thread's handoff writer runs locally. It does not send files to an Orbit Thread service, collect telemetry or alter Git.
+> 🔒 Orbit Thread's skills and CLI run locally. The handoff writer does not send files to an Orbit Thread service, collect telemetry or alter Git. The optional **Orbit Next** MCP is the only networked component: it reads public GitHub data and stores nothing.
 
 The installer protects unmanaged skills and locally modified managed files. Setup leaves unrelated instructions and existing project documents alone. Resume is read-only and conservatively redacts sensitive-looking text and paths in its report.
 

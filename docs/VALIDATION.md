@@ -270,3 +270,23 @@ Results are recorded in the release PR and final report. Checks run: `npm test`,
 ### Compatibility
 
 Existing v1.2.x installations keep working; `orbit-thread update` refreshes managed skills to 1.2.2 without touching locally edited files. Authenticated native Codex and Claude sessions were not re-run for this metadata-only release.
+
+## v1.3.0: Orbit Next (feature branch `feat/orbit-next-mcp`)
+
+Run on 12 October 2026, macOS, Node.js 24.16.0. v1.2.2 files are unchanged apart from version metadata.
+
+| Check | Result |
+| :--- | :--- |
+| `npm test` (CLI/skills + Orbit Next wiring) | 57 pass: the 52 existing tests plus 5 new, 0 fail |
+| `npm run test:worker` (vitest, mocked GitHub) | 90 pass: validation, sanitisation, GitHub client, analysers, MCP via the official SDK client, HTTP hardening |
+| `npm run typecheck:worker` | clean (`tsc --noEmit`, strict) |
+| `npm audit` in `worker/` | 0 vulnerabilities |
+| `npm run validate` / `scan:public` | pass (69 files); ZIP contents scanned separately (18 files) |
+| `npm run build:plugin`, `npm pack`, `npm run smoke:pack` | pass; ZIP and tarball include `.mcp.json`; tarball (33 files) excludes `worker/`; smoke test covers install, setup, configure, doctor, resume, update and uninstall |
+| `claude plugin validate ./plugin --strict` and `. --strict` | pass |
+| Staging deploy `orbit-thread-mcp-staging` + `worker/scripts/e2e.mjs` | pass: initialize, `tools/list` (3 read-only tools), all three tools on a real repository, rejection of invalid owner/repo/run_id and a missing repository, 403 for a foreign Origin, 405 for GET |
+| Real-data spot checks | `assess_release_readiness` correctly reported `v1.2.2` as already tagged; `diagnose_ci_failure` on a failed public Actions run returned the failed job/step and annotations without a root-cause claim |
+
+Findings during validation: (1) `redirect: 'error'` is not usable in the Workers runtime and made every GitHub call fail on the deployed Worker while mocked tests passed; fixed with `redirect: 'manual'` plus an explicit redirect error and a test. (2) GitHub's unauthenticated limit was exhausted from the shared Cloudflare egress during testing; the tools returned a clear rate-limit error with a retry hint, as designed.
+
+Not verified: a production endpoint (none exists), Codex native MCP loading of `plugin/.mcp.json` (no Codex CLI available), and authenticated GitHub behaviour (out of scope).

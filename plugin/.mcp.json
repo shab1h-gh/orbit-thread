@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "orbit-next": {
+      "type": "http",
+      "url": "${ORBIT_NEXT_URL:-https://orbit-next.invalid/mcp}"
+    }
+  }
+}

@@ -6,8 +6,9 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const tarballs = fs.readdirSync(root).filter(name => /^orbit-thread-\d+\.\d+\.\d+\.tgz$/.test(name));
-assert.equal(tarballs.length, 1, `Expected one Orbit Thread tarball, found ${tarballs.length}`);
+const { version } = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+const tarballs = fs.readdirSync(root).filter(name => name === `orbit-thread-${version}.tgz`);
+assert.equal(tarballs.length, 1, `Expected orbit-thread-${version}.tgz (run npm pack first), found ${tarballs.length}`);
 
 const temp = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'orbit-thread-pack-'));
 try {
@@ -28,6 +29,9 @@ try {
   const ok = result => assert.equal(result.status, 0, result.stderr + result.stdout);
 
   ok(run('--version'));
+  assert.equal(fs.existsSync(path.join(prefix, 'node_modules/orbit-thread/worker')), false, 'worker/ must not ship in the npm package');
+  assert.equal(fs.existsSync(path.join(prefix, 'node_modules/orbit-thread/plugin/.mcp.json')), true);
+  assert.equal(run('--version').stdout.trim().endsWith(version), true);
   ok(run('install', '--agent', 'both', '--scope', 'project', '--yes'));
   ok(run('setup', '--agent', 'both', '--yes'));
   ok(run('configure', '--agent', 'claude', '--model', 'Fixture Claude', '--effort', 'low'));

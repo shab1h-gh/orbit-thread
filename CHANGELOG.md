@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.3.0 — 12 October 2026
+
+- Add **Orbit Next**, an optional read-only remote MCP server (`worker/`, a stateless Cloudflare Worker named `orbit-thread-mcp`, Streamable HTTP at `/mcp`) for **public** GitHub repositories:
+  - `get_project_next_actions(owner, repo)`: deterministic, prioritised next actions with severity, source URLs, verified/heuristic labels and explicit unknowns.
+  - `diagnose_ci_failure(owner, repo, run_id?)`: failed jobs/steps, bounded sanitised annotations and heuristic investigation areas; never claims a root cause.
+  - `assess_release_readiness(owner, repo)`: PASS/WARN/BLOCKED/UNKNOWN for CI, open PRs, version consistency, changelog and tags; human approval and publication are reported as not determined / not performed.
+- Security: GET-only GitHub access to two fixed hosts, strict owner/repo/run-id validation, an allowlist of fetchable file paths pinned to a commit SHA, no redirects, size/time/request budgets, output sanitisation and secret redaction, Origin checks, a request-size cap and a per-IP rate limit. No credentials, database, telemetry or AI inference.
+- Plugin: add `plugin/.mcp.json` (server `orbit-next`, endpoint from `ORBIT_NEXT_URL`) and reference it from the portable and Claude manifests. Setup, Handoff, Resume, the npm CLI and the installer are unchanged; the CLI still has no dependencies and `worker/` is not shipped in the npm package.
+- Tooling: `npm run validate` checks the MCP wiring and tool contract, `npm run scan:public` rejects private `workers.dev` hosts and Cloudflare account IDs, CI gains a Worker job (audit, typecheck, tests, dry-run deploy), and the root test script is scoped to `tests/*.test.mjs`.
+- Docs: README, ARCHITECTURE, DESIGN, ROADMAP, AGENTS, SECURITY, PRIVACY, TERMS, SUBMISSION, VALIDATION and PUBLISHING updated. No public production endpoint is published by this release.
+
 ## 1.2.2 — 12 October 2026
 
 - Add a public [Terms of Service](TERMS.md) and declare it as `termsOfServiceURL` in the OpenAI plugin manifest.
