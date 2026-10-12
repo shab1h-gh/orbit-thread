@@ -177,3 +177,63 @@ Those native CLIs are not part of GitHub CI, so CI success does not claim those 
 
 OpenAI and Anthropic public-directory review is separate from npm/GitHub distribution. Their publisher dashboards are authoritative after submission; local validation does not imply approval.
 
+## Orbit Resume v1.2.0 validation
+
+Release validation completed on 12 October 2026 on the `feature/orbit-resume` branch (PR #3) for v1.2.0. `orbit-thread@1.1.0` was confirmed published on the public npm registry before the version bump; v1.2.0 has not been tagged, published or merged.
+
+### Verified locally for the v1.2.0 release candidate
+
+- All 43 automated tests passed, including Codex and Claude project installation,
+  reinstall, update, Doctor, missing/invalid/stale handoffs, branch changes,
+  future dates, terminal-control sanitisation, secret redaction, and preservation
+  of dirty working trees.
+- `npm run validate`, `npm run scan:public`, `npm run build:plugin` and
+  `git diff --check` passed.
+- `claude plugin validate ./plugin --strict` and `claude plugin validate . --strict` passed.
+- `npm pack` produced `orbit-thread-1.2.0.tgz` (28 files, including `lib/resume.mjs` and
+  `plugin/skills/orbit-resume/`), and `npm run smoke:pack` passed against it in a disposable
+  Git project: `resume`, install, setup, configure, Doctor, update and uninstall.
+- `dist/orbit-thread-plugin-1.2.0.zip` contains 16 files: portable and Claude manifests,
+  all three skills, icon, licence, privacy and security documents. Both archives report
+  version 1.2.0 throughout, with no private paths or build residue.
+- Release metadata (`package.json`, `plugin/plugin.json`, `plugin/.claude-plugin/plugin.json`
+  and `.claude-plugin/marketplace.json`) is consistent at 1.2.0; `npm run validate` enforces this.
+
+### Compatibility with v1.1.0 installations
+
+Using the published `orbit-thread@1.1.0` from the npm registry, a disposable project was installed
+and set up with `handoff` and `orbit-setup` only, then updated with the packed 1.2.0 CLI.
+Update added `orbit-resume` for Codex and Claude, kept the existing `handoff` and `orbit-setup`
+skills, `.orbit-thread/config.json`, local edits to living docs and user content in `AGENTS.md`, and
+Doctor reported all three skills current at v1.2.0. A locally edited managed skill file was still
+refused with an instruction to preserve changes. The 1.2.0 `resume` command ran read-only,
+and uninstall preserved project docs and configuration.
+
+### Reported native agent testing (not CI)
+
+The maintainer reported successful authenticated native testing of the feature-branch skills in fresh
+Codex and Claude Code sessions, using a disposable Git project: Setup, Doctor, handoff
+validation and Resume recovery scenarios passed, and both automatic and explicit manual Resume
+invocation worked in each agent. This was an interactive local test recorded from the
+maintainer's report; it is not part of GitHub CI and was not re-run during release preparation.
+Codex emitted macOS temporary-cache warnings during Git reads but still reported branch,
+status and commit.
+
+### Verified in GitHub CI
+
+GitHub CI covers the macOS and Linux Node.js matrix, the test suite, package validation, the
+public-source scan, plugin ZIP generation, `npm pack` and the packed-tarball smoke test. CI does not run
+authenticated Codex or Claude sessions or `claude plugin validate`. The PR #3 CI run on the
+previous commit passed; CI for the release commit is checked on the pull request after push.
+
+### Security review
+
+A security review identified a low-risk terminal-control injection through branch metadata in a
+local handoff. Resume strips terminal control sequences from displayed repository and handoff text; a
+regression test confirms they do not reach terminal output.
+
+### Remaining release-gate checks
+
+- Merge PR #3, then tag v1.2.0 from the merged release commit.
+- Publish `orbit-thread@1.2.0` and repeat the public-registry smoke test described in
+  [PUBLISHING.md](PUBLISHING.md).

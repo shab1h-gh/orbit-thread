@@ -23,7 +23,7 @@ assert.equal(pkg.scripts?.postinstall, undefined);
 assert.equal(pkg.dependencies, undefined);
 assert.equal(portable.extensions['com.openai'].onboardingSkill, './skills/orbit-setup/SKILL.md');
 
-for (const skill of ['handoff', 'orbit-setup']) {
+for (const skill of ['handoff', 'orbit-setup', 'orbit-resume']) {
   const dir = path.join(root, 'plugin/skills', skill);
   const markdown = fs.readFileSync(path.join(dir, 'SKILL.md'), 'utf8');
   assert.match(markdown, new RegExp(`^---\\nname: ${skill}\\ndescription: .+\\n---`, 's'));
@@ -35,6 +35,7 @@ for (const skill of ['handoff', 'orbit-setup']) {
 assert.equal(fs.existsSync(path.join(root, 'plugin/skills/handoff/scripts/write_handoff.sh')), true);
 assert.equal(fs.existsSync(path.join(root, 'plugin/skills/orbit-setup/scripts/setup_project.mjs')), true);
 assert.equal(fs.existsSync(path.join(root, 'plugin/skills/orbit-setup/scripts/project_config.mjs')), true);
+assert.equal(fs.existsSync(path.join(root, 'plugin/skills/orbit-resume/agents/openai.yaml')), true);
 assert.equal(fs.existsSync(path.join(root, 'bin/orbit-thread.mjs')), true);
 
 const listing = portable.extensions['com.openai'].interface;
@@ -42,4 +43,4 @@ for (const [key, limit] of Object.entries({ displayName: 30, shortDescription: 3
   assert.ok(typeof listing[key] === 'string' && listing[key].length > 0 && listing[key].length <= limit, key);
 }
 
-console.log('Orbit Thread dual-skill package, onboarding metadata, config and implicit invocation validated.');
+console.log('Orbit Thread skills, onboarding metadata, config and implicit invocation validated.');

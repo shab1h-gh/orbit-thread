@@ -14,8 +14,9 @@ No giant session diary. No separate account or hosted memory service. Your repos
 | --- | --- |
 | 🧭 **Orbit Setup** | Prepares project docs, agent instructions and optional subagent preferences. |
 | 🔁 **Handoff** | Records the current objective, completed work, risks and next actions in `HANDOFF-STATE.md`. |
+| ▶️ **Resume** | Reconstructs concise current context from the handoff and read-only Git state. |
 
-**Jump to:** [Quick start](#quick-start) · [How it works](#how-it-works) · [Setup files](#what-setup-creates) · [Handoff](#handoff-and-recovery) · [Subagents](#configure-subagents) · [Doctor](#check-your-setup) · [Commands](#command-reference) · [Help](#troubleshooting)
+**Jump to:** [Quick start](#quick-start) · [How it works](#how-it-works) · [Setup files](#what-setup-creates) · [Handoff and Resume](#handoff-and-resume) · [Subagents](#configure-subagents) · [Doctor](#check-your-setup) · [Commands](#command-reference) · [Help](#troubleshooting)
 
 ## Quick start
 
@@ -35,11 +36,11 @@ npx orbit-thread setup --agent both --yes
 
 Once installed, call the skills in your coding agent:
 
-| Where you're working | Set up a project | Save a handoff |
-| --- | --- | --- |
-| Codex | `$orbit-setup` | `$handoff` |
-| Claude Code | `/orbit-setup` | `/handoff` |
-| Claude marketplace plugin | `/orbit-thread:orbit-setup` | `/orbit-thread:handoff` |
+| Where you're working | Set up a project | Save a handoff | Resume a fresh chat |
+| --- | --- | --- | --- |
+| Codex | `$orbit-setup` | `$handoff` | `$orbit-resume` |
+| Claude Code | `/orbit-setup` | `/handoff` | `/orbit-resume` |
+| Claude marketplace plugin | `/orbit-thread:orbit-setup` | `/orbit-thread:handoff` | `/orbit-thread:orbit-resume` |
 
 The commands above are **skill invocations**, not Terminal commands. You can also ask the agent to run a handoff after a verified milestone.
 
@@ -111,7 +112,7 @@ The generated instructions ask coding agents to read only the documents and sour
 
 They also tell agents to preserve applied migrations, leave history to Git and run an appropriate check before claiming work is finished.
 
-## Handoff and recovery
+## Handoff and Resume
 
 ### When to save a handoff
 
@@ -158,13 +159,25 @@ The writer validates the replacement before saving it, checks for recognisable s
 
 ### Starting a fresh session
 
+Start each new coding task in a fresh chat. Orbit Setup asks the agent to invoke Resume once when the session starts (automatically where the host supports it). If it does not start automatically, use `$orbit-resume`, `/orbit-resume`, or `/orbit-thread:orbit-resume` in Claude marketplace installs. Do not invoke it repeatedly in the same session.
+
+For a terminal summary, run:
+
+```bash
+npx orbit-thread resume
+```
+
+Resume prints the handoff objective, verified milestones, unfinished work, risks, verification, current branch and working-tree status, next steps and relevant living-doc paths. It is read-only: it does not modify files or Git, install tools, deploy, or inspect secret files. It uses current repository evidence over stale handoff details, flags a handoff that appears older than the latest commit, and preserves dirty changes. If the handoff is absent or invalid, it says what is unknown rather than guessing.
+
+This lightweight checkpoint saves tokens by replacing repeated conversation history with a short summary and only the project documents the next task needs. It cannot recover details that were never recorded, prove that an unrecorded check passed, or determine the user's next goal when none was stated. Use the current request as the objective and say when evidence is missing.
+
 The project instructions ask the agent to:
 
-1. Read `HANDOFF-STATE.md` once, if present.
-2. Check the branch, working tree, diff and recent Git history.
-3. Read only the relevant living docs.
-4. Inspect the source needed for the next task.
-5. Preserve valid unfinished work and continue from the latest verified point.
+1. Use the Resume summary or read `HANDOFF-STATE.md` once if no summary was supplied.
+2. Check the branch, working tree, diff summary and recent Git history.
+3. Read only living docs relevant to the current task.
+4. Inspect only source needed for the next action.
+5. Preserve unfinished work and continue from the latest verified point.
 
 You do not need to paste an old conversation into the next session.
 
@@ -224,7 +237,7 @@ npx orbit-thread doctor --agent codex --scope project
 npx orbit-thread doctor --agent claude --scope project
 ```
 
-Doctor checks skill versions, project configuration, managed instruction blocks, living docs, Git ignore rules and handoff size.
+Doctor checks skill versions (including Resume), project configuration, managed instruction blocks, living docs, Git ignore rules and handoff size.
 
 **How do you know it passed?** A successful command exits with status `0`. To print a clear confirmation:
 
@@ -258,8 +271,8 @@ npx orbit-thread install
 
 | Agent | Project skill directories |
 | --- | --- |
-| Codex | `.agents/skills/handoff/` and `.agents/skills/orbit-setup/` |
-| Claude Code | `.claude/skills/handoff/` and `.claude/skills/orbit-setup/` |
+| Codex | `.agents/skills/handoff/`, `.agents/skills/orbit-setup/` and `.agents/skills/orbit-resume/` |
+| Claude Code | `.claude/skills/handoff/`, `.claude/skills/orbit-setup/` and `.claude/skills/orbit-resume/` |
 
 A user level install uses the equivalent directories under `~/.agents/skills/` or `~/.claude/skills/`.
 
@@ -285,8 +298,9 @@ This GitHub marketplace route is separate from the **official Anthropic public d
 
 | Command | Purpose |
 | --- | --- |
-| `npx orbit-thread install` | Install the two skills for selected agents. |
+| `npx orbit-thread install` | Install the three skills for selected agents. |
 | `npx orbit-thread setup` | Prepare or update project docs and managed instructions. |
+| `npx orbit-thread resume` | Print a concise, read-only project and Git summary. |
 | `npx orbit-thread configure` | Save project subagent preferences. |
 | `npx orbit-thread doctor` | Check the project's continuity setup. |
 | `npx orbit-thread check` | Check managed skill installation only. |
@@ -314,7 +328,7 @@ The update command protects locally edited managed skill files. Setup updates ma
 
 ### Moving from Orbit Handoff 1.0.x
 
-Orbit Thread is the successor to **Orbit Handoff**. The v1.1 CLI recognises compatible older managed installations and state while preserving local edits.
+Orbit Thread is the successor to **Orbit Handoff**. The v1.1 and later CLI recognises compatible older managed installations and state while preserving local edits.
 
 ```bash
 npx orbit-thread@latest update --agent both --scope project --yes

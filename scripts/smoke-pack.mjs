@@ -33,10 +33,11 @@ try {
   ok(run('configure', '--agent', 'claude', '--model', 'Fixture Claude', '--effort', 'low'));
   ok(run('configure', '--agent', 'codex', '--model', 'Fixture Codex', '--reasoning', 'high'));
   ok(run('doctor', '--agent', 'both', '--scope', 'project'));
+  ok(run('resume'));
   ok(run('update', '--agent', 'both', '--scope', 'project', '--yes'));
 
   for (const agentDir of ['.agents', '.claude']) {
-    for (const skill of ['handoff', 'orbit-setup']) {
+    for (const skill of ['handoff', 'orbit-setup', 'orbit-resume']) {
       const skillDir = path.join(project, agentDir, 'skills', skill);
       assert.equal(fs.existsSync(path.join(skillDir, 'SKILL.md')), true);
       assert.equal(fs.existsSync(path.join(skillDir, '.orbit-thread.json')), true);

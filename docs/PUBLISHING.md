@@ -1,8 +1,10 @@
 # npm publication and releases
 
-Orbit Thread v1.1.0 is the successor to Orbit Handoff v1.0.x.
+Orbit Thread v1.2.0 adds Orbit Resume to the Orbit Thread line, which succeeded Orbit Handoff v1.0.x in v1.1.0.
 
-Historical `orbit-handoff@1.0.0` and `orbit-handoff@1.0.1` releases are immutable. Do not republish, unpublish or move their release tags.
+`orbit-thread@1.1.0` is already published. v1.2.0 is a new version.
+
+Historical `orbit-handoff@1.0.0`, `orbit-handoff@1.0.1` and `orbit-thread@1.1.0` releases are immutable. Do not republish, unpublish or move their release tags.
 
 The new primary package is:
 
@@ -33,15 +35,18 @@ claude plugin validate . --strict
 Inspect:
 
 ```text
-orbit-thread-1.1.0.tgz
-dist/orbit-thread-plugin-1.1.0.zip
+orbit-thread-1.2.0.tgz
+dist/orbit-thread-plugin-1.2.0.zip
 ```
 
-Confirm both canonical skills are present:
+The npm tarball should contain 28 files (version 1.2.0, including `lib/resume.mjs` and `plugin/skills/orbit-resume/`). The plugin ZIP should contain the portable `plugin.json`, the three canonical skills and the listing icon. Neither should contain tests, `dist/`, credentials or other build residue.
+
+Confirm all three canonical skills are present:
 
 ```text
 plugin/skills/handoff/
 plugin/skills/orbit-setup/
+plugin/skills/orbit-resume/
 ```
 
 and that the packed CLI can install, setup, configure, doctor, update and uninstall in a disposable repository.
@@ -51,7 +56,7 @@ and that the packed CLI can install, setup, configure, doctor, update and uninst
 After release checks pass:
 
 ```sh
-npm publish ./orbit-thread-1.1.0.tgz --access public --registry https://registry.npmjs.org/
+npm publish ./orbit-thread-1.2.0.tgz --access public --registry https://registry.npmjs.org/
 ```
 
 Complete npm's normal browser/2FA challenge if prompted. Never weaken npm account security to automate publication.
@@ -73,7 +78,7 @@ npx orbit-thread@latest doctor --agent both --scope project
 npx orbit-thread@latest uninstall --agent both --scope project --yes
 ```
 
-Verify `latest` resolves to `1.1.0` and package metadata points to `shab1h-gh/orbit-thread`.
+Also confirm `npx orbit-thread@latest resume` runs read-only in the disposable repository. Verify `latest` resolves to `1.2.0` and package metadata points to `shab1h-gh/orbit-thread`.
 
 ## Existing Orbit Handoff users
 
@@ -85,7 +90,7 @@ npx orbit-thread@latest setup --agent both --yes
 npx orbit-thread doctor --agent both --scope project
 ```
 
-The v1.1 CLI accepts compatible Orbit Handoff ownership/project state and migrates it while refusing locally edited managed files.
+The v1.1 and later CLI accepts compatible Orbit Handoff ownership/project state and migrates it while refusing locally edited managed files.
 
 After Orbit Thread is publicly verified, the old package may be deprecated with a migration message, but must not be unpublished:
 
