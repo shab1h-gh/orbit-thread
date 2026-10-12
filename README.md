@@ -486,7 +486,7 @@ The secret checker catches some recognisable patterns, **not every type of sensi
 
 Installing packages or using a coding agent can still involve **npm, GitHub, OpenAI or Anthropic** under those providers' own terms and privacy policies.
 
-Read [Security](SECURITY.md) and [Privacy](PRIVACY.md) for the details.
+Read [Security](SECURITY.md), [Privacy](PRIVACY.md) and [Terms of Service](TERMS.md) for the details.
 
 ## Provider directories
 
