@@ -297,7 +297,7 @@ Reliability and auth tests (`worker/test/auth.test.ts`, mocked): token sent only
 
 Compatibility: `plugin/plugin.json` and `plugin/mcp.json` validate against the official Agent Plugins 1.0.0 JSON Schemas (Ajv 2020-12, run from `worker/node_modules`); `claude plugin validate plugin --strict` and `. --strict` pass; with an isolated `CLAUDE_CONFIG_DIR`, a fresh install and a marketplace upgrade from v1.2.2 both end at 1.3.0 with three skills, and `claude mcp list` shows `orbit-next` Connected to production. ZIP builds are byte-identical across runs; ZIP and tarball scans are clean; `npm audit` reports 0 vulnerabilities.
 
-Not verified: Codex (no CLI; commands in [REVIEW.md](REVIEW.md)), Node 20 locally (CI matrix), production with a configured token (owner action), live invalid-token behaviour (mocked only).
+Codex CLI: connected to the production endpoint and invoked all three tools successfully (details in [REVIEW.md](REVIEW.md#codex)); this was recorded after release. Not verified: Codex portable plugin ZIP installation, Node 20 locally (CI matrix), live invalid-token behaviour (mocked only). The operator-held token was configured in production by the owner after this validation.
 
 ### PR #7 repair (portable MCP packaging, Node 20 test glob)
 
