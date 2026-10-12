@@ -3,11 +3,22 @@
   "name": "orbit-thread",
   "version": "1.2.1",
   "description": "Token-efficient project setup, checkpoints and coding-session continuity.",
-  "author": { "name": "Shabih Anwar", "url": "https://github.com/shab1h-gh" },
+  "author": {
+    "name": "Shabih Anwar",
+    "url": "https://github.com/shab1h-gh"
+  },
   "homepage": "https://github.com/shab1h-gh/orbit-thread",
   "repository": "https://github.com/shab1h-gh/orbit-thread",
   "license": "MIT",
-  "keywords": ["handoff", "resume", "codex", "claude-code", "continuity", "project-setup", "developer-tools"],
+  "keywords": [
+    "handoff",
+    "resume",
+    "codex",
+    "claude-code",
+    "continuity",
+    "project-setup",
+    "developer-tools"
+  ],
   "extensions": {
     "com.openai": {
       "interface": {
@@ -16,14 +27,23 @@
         "longDescription": "Orbit Thread gives coding agents a small, durable continuity layer. Orbit Setup creates only missing PRODUCT, DESIGN, ARCHITECTURE, SECURITY and ROADMAP living docs, adds selective context-loading and bounded-subagent rules, and keeps local execution state separate from tracked project truth. Handoff overwrites a compact HANDOFF-STATE.md at verified checkpoints. Resume starts a fresh chat from the current handoff, read-only Git state and only the living docs needed for the task, reducing repeated context while preserving unfinished changes. Handoffs are capped at 50 lines, validated before atomic replacement, and the writer makes no network calls or Git mutations. Existing project docs and unrelated instructions are preserved.",
         "developerName": "Shabih Anwar",
         "category": "Developer Tools",
-        "capabilities": ["Prepare project continuity", "Save verified coding checkpoints", "Resume coding sessions"],
+        "capabilities": [
+          "Prepare project continuity",
+          "Save verified coding checkpoints",
+          "Resume coding sessions"
+        ],
         "websiteURL": "https://github.com/shab1h-gh/orbit-thread",
         "supportURL": "https://github.com/shab1h-gh/orbit-thread/issues",
         "privacyPolicyURL": "https://github.com/shab1h-gh/orbit-thread/blob/main/PRIVACY.md",
-        "defaultPrompt": ["Prepare this coding project for efficient continuity, resume a fresh coding session, or save verified current state at a meaningful checkpoint."],
+        "defaultPrompt": [
+          "Set up this coding project for continuity with lightweight docs and agent instructions.",
+          "Save a verified handoff with completed work, risks and the next steps.",
+          "Resume coding from the latest handoff, current Git state and relevant project docs."
+        ],
         "brandColor": "#4338CA",
         "composerIcon": "./assets/icon.png",
-        "logo": "./assets/icon.png"
+        "logo": "./assets/icon.png",
+        "termsOfServiceURL": "https://github.com/shab1h-gh/orbit-thread/blob/main/TERMS.md"
       },
       "onboardingSkill": "./skills/orbit-setup/SKILL.md",
       "publication": {
