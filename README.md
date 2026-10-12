@@ -1,26 +1,28 @@
-# 🧵 Orbit Thread
+<h1 align="center">🧵 Orbit Thread</h1>
+<p align="center"><strong>Pick up where you left off. Not where the chat ended.</strong></p>
+<p align="center">Lightweight project context, verified handoffs and fresh-session recovery for <strong>Codex</strong> and <strong>Claude Code</strong>.</p>
+<p align="center">
+  <a href="https://www.npmjs.com/package/orbit-thread"><img alt="npm version" src="https://img.shields.io/npm/v/orbit-thread?label=npm"></a>
+  <a href="https://github.com/shab1h-gh/orbit-thread/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/shab1h-gh/orbit-thread/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-blue.svg"></a>
+</p>
+<p align="center"><a href="#quick-start"><strong>Quick start</strong></a> · <a href="#how-it-works">How it works</a> · <a href="#orbit-resume-starting-a-fresh-session">Orbit Resume</a> · <a href="#command-reference">Commands</a> · <a href="#troubleshooting">Troubleshooting</a></p>
 
-**Pick up where you left off, without carrying an entire coding conversation into the next session.**
+---
 
-[![npm version](https://img.shields.io/npm/v/orbit-thread?label=npm)](https://www.npmjs.com/package/orbit-thread)
-[![CI](https://github.com/shab1h-gh/orbit-thread/actions/workflows/ci.yml/badge.svg)](https://github.com/shab1h-gh/orbit-thread/actions/workflows/ci.yml)
-[![MIT licence](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+Orbit Thread prepares small living docs, captures meaningful progress and helps your next coding session recover only the context it needs. **Your repository and Git remain the source of truth.** There is no hosted memory account or giant session diary.
 
-Orbit Thread helps **Codex** and **Claude Code** keep their place during long projects. It gives each project a small set of useful documents and saves a short handoff when the agent reaches a verified checkpoint.
+### Three skills, one workflow
 
-No giant session diary. No separate account or hosted memory service. Your repository and Git history remain the source of truth.
-
-| Skill | What it does |
-| --- | --- |
-| 🧭 **Orbit Setup** | Prepares project docs, agent instructions and optional subagent preferences. |
-| 🔁 **Handoff** | Records the current objective, completed work, risks and next actions in `HANDOFF-STATE.md`. |
-| ▶️ **Resume** | Reconstructs concise current context from the handoff and read-only Git state. |
-
-**Jump to:** [Quick start](#quick-start) · [How it works](#how-it-works) · [Setup files](#what-setup-creates) · [Handoff and Resume](#handoff-and-resume) · [Subagents](#configure-subagents) · [Doctor](#check-your-setup) · [Commands](#command-reference) · [Help](#troubleshooting)
+| Skill | What it does | When to use it |
+| :--- | :--- | :--- |
+| 🧭 **[Orbit Setup](#what-setup-creates)** | Prepares project docs, agent instructions and subagent preferences without replacing existing knowledge. | Starting or onboarding a project. |
+| 💾 **[Handoff](#when-to-save-a-handoff)** | Writes a concise, verified checkpoint to `HANDOFF-STATE.md`. | After meaningful milestones or before a fresh chat. |
+| ▶️ **[Orbit Resume](#orbit-resume-starting-a-fresh-session)** | Recovers progress, open tasks and the next action from the handoff and read-only repository evidence. | Once at the start of a new coding conversation. |
 
 ## Quick start
 
-> 🚀 Run these commands **inside the project** you want to set up.
+> **Run these commands from the project root.** Requires Node.js 20+ on macOS or Linux.
 
 ```bash
 npx orbit-thread install
@@ -42,41 +44,29 @@ Once installed, call the skills in your coding agent:
 | Claude Code | `/orbit-setup` | `/handoff` | `/orbit-resume` |
 | Claude marketplace plugin | `/orbit-thread:orbit-setup` | `/orbit-thread:handoff` | `/orbit-thread:orbit-resume` |
 
-The commands above are **skill invocations**, not Terminal commands. You can also ask the agent to run a handoff after a verified milestone.
+The commands in the table are **skill invocations in your coding agent's chat**, not Terminal commands. The agent can also save a handoff after a verified milestone, where its host supports automatic skill invocation.
 
 ## How it works
 
-Orbit Thread keeps **lasting project knowledge** separate from **what the agent is doing right now**.
+Orbit Thread keeps **lasting project knowledge** separate from **the task you're doing right now**.
 
-```text
-Existing project
-      │
-      ▼
-Orbit Setup
-      │
-      ├── Living docs and agent instructions
-      └── Project preferences
-      │
-      ▼
-Agent completes verified work
-      │
-      ▼
-Handoff rewrites HANDOFF-STATE.md
-      │
-      ▼
-Next session checks handoff + Git + relevant docs
-      │
-      ▼
-Continue from the last verified point
+```mermaid
+flowchart LR
+    A["🧭 Setup<br/>Docs + agent rules"] --> B["Build and verify<br/>Real project work"]
+    B --> C["💾 Handoff<br/>Local checkpoint"]
+    C --> D["▶️ Resume<br/>Fresh chat + Git state"]
+    D --> B
 ```
 
-The important distinction:
+| Source | Role |
+| :--- | :--- |
+| **Git** | Code history, active branch and working-tree truth. |
+| **Living docs** | The current product, design, architecture, security and roadmap. |
+| **`HANDOFF-STATE.md`** | Short local checkpoint of verified progress and unfinished work. |
+| **Resume** | Reconciles that checkpoint with current Git and only the relevant docs. |
 
-- **Git** keeps the history of code and decisions.
-- **Living docs** describe the project as it stands today.
-- **`HANDOFF-STATE.md`** says where the current task stands and what needs doing next.
-
-The handoff is a checkpoint, **not** another changelog or a substitute for Git. If the handoff is stale, the current repository state wins.
+> [!IMPORTANT]
+> A handoff isn't a changelog or synchronised chat history. **Current repository evidence overrides stale notes.**
 
 ## What setup creates
 
@@ -116,25 +106,19 @@ They also tell agents to preserve applied migrations, leave history to Git and r
 
 ### When to save a handoff
 
-Handoff is intended for moments that matter:
-
-- After a verified milestone that changes the repository or lasting project information.
-- At the end of a coding task that made those changes.
-- Before clearing a session or stopping because of a usage or context warning.
-
-It is not necessary for ordinary questions or tiny edits with no lasting effect. Each successful checkpoint **replaces** the previous handoff.
+Save a Handoff **after verified work**, before clearing a chat or when nearing a context/usage limit. It is useful after a meaningful milestone or a completed coding task, not for every question or trivial edit. Each checkpoint **overwrites** the previous one.
 
 ### What gets saved?
 
-Handoffs are usually around 30 lines, with a **hard limit of 50 lines**.
+The local, Git-ignored `HANDOFF-STATE.md` records a compact checkpoint, usually about 30 lines, with a **50-line maximum**:
 
 ```markdown
 # Handoff State
 
-Updated: 07-10-2026 00:30
+Updated: 12-10-2026 08:30
 
 ## Current objective
-- Finish account security settings.
+- Complete account security settings.
 
 ## Completed milestones
 - Added the settings route.
@@ -143,8 +127,11 @@ Updated: 07-10-2026 00:30
 ## In progress
 - Passkey management UI.
 
+## Current state
+- Branch: feature/security-settings
+
 ## Open issues / risks
-- Passkey removal still needs a browser test.
+- Passkey removal needs browser verification.
 
 ## Immediate next steps
 1. Finish passkey management.
@@ -155,31 +142,70 @@ Updated: 07-10-2026 00:30
 - Unit tests passed: 42/42.
 ```
 
-The writer validates the replacement before saving it, checks for recognisable secret patterns and writes the file atomically. **It makes no network requests and does not change Git.** Secret detection is a safety net, not a guarantee; never put sensitive data in a handoff.
+**v1.2.1 compatibility:** Resume also recognises `## Completed this session`, while keeping `## Completed milestones` canonical. If both have entries, it uses the canonical heading without duplicates. It handles **multiple entries, blank lines and subheadings**, showing up to six entries per section to keep the summary compact.
 
-### Starting a fresh session
+Handoff validates the replacement, checks recognisable secret patterns and writes atomically. It makes no network requests or Git changes. Never put credentials or sensitive personal/production details in a handoff.
 
-Start each new coding task in a fresh chat. Orbit Setup asks the agent to invoke Resume once when the session starts (automatically where the host supports it). If it does not start automatically, use `$orbit-resume`, `/orbit-resume`, or `/orbit-thread:orbit-resume` in Claude marketplace installs. Do not invoke it repeatedly in the same session.
+### Orbit Resume: starting a fresh session
 
-For a terminal summary, run:
+**Orbit Resume turns a previous checkpoint into an evidence-based starting point for a new chat.** It reads the latest usable handoff, current Git status and only the living docs relevant to the next task. You don't need to paste your old conversation into the new one.
+
+After Setup, your project instructions ask the agent to run Resume **once at the start of a fresh coding session**. Automatic invocation varies by host; the reliable fallback is a manual skill call:
+
+| Where | Type in the **agent chat** |
+| :--- | :--- |
+| **Codex** | `$orbit-resume` |
+| **Claude Code** | `/orbit-resume` |
+| **Claude GitHub marketplace plugin** | `/orbit-thread:orbit-resume` |
+
+**Terminal-only summary:** run this from your project's root:
 
 ```bash
-npx orbit-thread resume
+npx orbit-thread@latest resume
 ```
 
-Resume prints the handoff objective, verified milestones, unfinished work, risks, verification, current branch and working-tree status, next steps and relevant living-doc paths. It is read-only: it does not modify files or Git, install tools, deploy, or inspect secret files. It uses current repository evidence over stale handoff details, flags a handoff that appears older than the latest commit, and preserves dirty changes. If the handoff is absent or invalid, it says what is unknown rather than guessing.
+That CLI command is read-only and **does not launch a coding agent**. Running `npx` may fetch the package from npm if needed; the Resume **skill itself never runs `npx` or installs tools**. Don't rerun the skill repeatedly in the same conversation.
 
-This lightweight checkpoint saves tokens by replacing repeated conversation history with a short summary and only the project documents the next task needs. It cannot recover details that were never recorded, prove that an unrecorded check passed, or determine the user's next goal when none was stated. Use the current request as the objective and say when evidence is missing.
+#### What Resume recovers
 
-The project instructions ask the agent to:
+| Signal | What it tells you |
+| :--- | :--- |
+| **Objective and milestones** | Previously recorded goals and verified achievements, with explicit unknowns where evidence is missing. |
+| **Unfinished work** | In-progress tasks, risks, verification notes and recorded next actions. |
+| **Current Git state** | Branch and dirty/untracked changes, without modifying your work. |
+| **Relevant living docs** | Pointers to `PRODUCT.md`, `DESIGN.md`, `ARCHITECTURE.md`, `SECURITY.md` or `ROADMAP.md` when the task needs them. |
 
-1. Use the Resume summary or read `HANDOFF-STATE.md` once if no summary was supplied.
-2. Check the branch, working tree, diff summary and recent Git history.
-3. Read only living docs relevant to the current task.
-4. Inspect only source needed for the next action.
-5. Preserve unfinished work and continue from the latest verified point.
+Missing, invalid or **possibly outdated** handoffs are reported instead of trusted blindly. A changed branch, a handoff date in the future or a newer Git commit date may flag a checkpoint as outdated. Current Git and tracked docs take priority; Resume never invents missing objectives or verification.
 
-You do not need to paste an old conversation into the next session.
+#### Common Resume use cases
+
+| Situation | Recommended action |
+| :--- | :--- |
+| **Fresh chat after a long task** | Write `$handoff` or `/handoff` after verified progress, then Resume in the next chat. |
+| **Context or usage limit** | Checkpoint before the limit when possible, then restart a conversation in the same project. |
+| **Switching Codex ↔ Claude Code** | Install for both agents in the **same local repo**; either agent can Resume from the same checkpoint and Git state. |
+| **Returning after days away** | Resume, review any stale-branch or commit warning, then consult only current relevant docs. |
+| **Working tree has uncommitted edits** | Resume identifies current changes **without** reset, clean, stash, stage or commit. |
+| **No handoff yet / new clone** | Resume reports what's unknown; give the agent the current task and let it inspect relevant current files. |
+
+#### Example: carry on without your old conversation
+
+**1. Save a checkpoint.** After completing and verifying part of a feature, type `$handoff` in Codex or `/handoff` in Claude Code.
+
+**2. Start a fresh chat** in the same project. If Resume doesn't start automatically, type `$orbit-resume` or `/orbit-resume`.
+
+**3. Continue from the recovered context.** For example:
+
+> Continue the unfinished account settings feature. Preserve my uncommitted changes, check current Git state, and read only the files needed for the next step.
+
+#### Safety and limitations
+
+- **Read-only:** Resume does not modify files or Git, reset, clean, stash, stage, commit, checkout, deploy or push.
+- **Selective context:** The skill checks the handoff, Git summaries and task-relevant living docs; it doesn't read `.env`, `.dev.vars`, private keys or unrelated files.
+- **Conservative redaction:** Secret-looking values and paths are hidden. Benign lines mentioning `token` or `secret` may also be redacted.
+- **Bounded input/output:** Handoff is capped at 50 lines; the terminal CLI refuses symlinks, invalid dates and files larger than 32 KB.
+- **Local state:** `HANDOFF-STATE.md` is Git-ignored, so it doesn't automatically transfer to a different machine or clean clone.
+- **Evidence first:** Resume cannot recover facts nobody recorded or prove an unverified test passed. Current repository state overrides stale notes.
 
 ## Configure subagents
 
@@ -300,7 +326,7 @@ This GitHub marketplace route is separate from the **official Anthropic public d
 | --- | --- |
 | `npx orbit-thread install` | Install the three skills for selected agents. |
 | `npx orbit-thread setup` | Prepare or update project docs and managed instructions. |
-| `npx orbit-thread resume` | Print a concise, read-only project and Git summary. |
+| `npx orbit-thread resume` | Print a concise, read-only project and Git summary; takes no extra options. |
 | `npx orbit-thread configure` | Save project subagent preferences. |
 | `npx orbit-thread doctor` | Check the project's continuity setup. |
 | `npx orbit-thread check` | Check managed skill installation only. |
@@ -341,6 +367,36 @@ The old `orbit-handoff` binary name remains an alias inside the new package. Ear
 If you installed the Claude GitHub marketplace plugin, update or reinstall it from `shab1h-gh/orbit-thread` and run `/orbit-thread:orbit-setup`.
 
 ## Troubleshooting
+
+
+<details>
+<summary><strong>Resume did not start automatically or the skill is missing</strong></summary>
+
+Automatic invocation depends on the coding host and its skill discovery. Use `$orbit-resume`, `/orbit-resume` or `/orbit-thread:orbit-resume` **in the agent chat**.
+
+If the skill is not found, verify the correct installation and scope:
+
+```bash
+npx orbit-thread doctor --agent both --scope project
+```
+
+You may need a fresh agent session to load new skills. A working `npx orbit-thread resume` Terminal command doesn't itself prove native skill discovery.
+
+</details>
+
+<details>
+<summary><strong>Resume reports a missing, invalid or outdated handoff</strong></summary>
+
+`HANDOFF-STATE.md` is local and Git-ignored; a fresh clone may not contain it. An invalid handoff might have a malformed date or heading, missing objective, excessive size or unsupported file type. An outdated warning may reflect a changed branch, future handoff date or newer Git commit. Check current repository evidence, preserve any unfinished work and save a new verified checkpoint when appropriate.
+
+</details>
+
+<details>
+<summary><strong>Resume missed a milestone or redacted harmless text</strong></summary>
+
+Use `## Completed milestones` for new checkpoints; v1.2.1 also reads `## Completed this session` and multiple entries per section. When both headings exist, the canonical one wins. Outdated handoffs are not accepted as verified progress. Privacy safeguards can redact an innocent sentence containing terms such as `secret` or `token`. Verify against the local handoff and Git without exposing sensitive data.
+
+</details>
 
 <details>
 <summary><strong>Doctor reports a changed AGENTS.md or CLAUDE.md block</strong></summary>
@@ -424,7 +480,7 @@ A restricted coding environment may report a permissions error even when your Ma
 
 > 🔒 Orbit Thread's handoff writer runs locally. It does not send files to an Orbit Thread service, collect telemetry or alter Git.
 
-The installer protects unmanaged skills and locally modified managed files. Setup leaves unrelated instructions and existing project documents alone.
+The installer protects unmanaged skills and locally modified managed files. Setup leaves unrelated instructions and existing project documents alone. Resume is read-only and conservatively redacts sensitive-looking text and paths in its report.
 
 The secret checker catches some recognisable patterns, **not every type of sensitive information**. Do not include passwords, API keys, recovery codes, personal data or production secrets in handoffs or living docs.
 
