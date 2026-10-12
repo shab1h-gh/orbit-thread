@@ -38,3 +38,5 @@ claude plugin validate . --strict
 Public-directory validation is separate from provider approval.
 
 Use British English in documentation.
+
+Orbit Next (`worker/`) changes must stay read-only and deterministic: GET-only requests to the fixed GitHub hosts, validated inputs, sanitised output, no credentials, storage or AI calls. Run `npm --prefix worker ci --ignore-scripts`, `npm run typecheck:worker` and `npm run test:worker` alongside the root checks.

@@ -33,5 +33,11 @@ with zipfile.ZipFile(output) as archive:
     assert 'skills/handoff/SKILL.md' in names
     assert 'skills/orbit-setup/SKILL.md' in names
     assert 'skills/orbit-resume/SKILL.md' in names
+    assert 'mcp.json' in names, 'portable Agent Plugins MCP config'
+    assert '.mcp.json' in names, 'Claude-compatible MCP config'
+    assert '.claude-plugin/plugin.json' in names
+    assert 'mcpServers' not in json.loads(archive.read('plugin.json')), 'portable manifest must not declare mcpServers'
+    assert json.loads(archive.read('.claude-plugin/plugin.json'))['mcpServers'] == './.mcp.json'
+    assert not any(n.startswith('worker/') or 'node_modules' in n for n in names)
 
 print(f'Built dist/{output.name} ({output.stat().st_size} bytes)')

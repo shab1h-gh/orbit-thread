@@ -1,8 +1,8 @@
 # npm publication and releases
 
-Orbit Thread v1.2.2 is a documentation and metadata release that resolves OpenAI plugin submission findings (Terms of Service URL and conversation-starter length). It does not change skill behaviour. v1.2.1 was a compatibility patch for Orbit Resume; v1.2.0 added Resume, and the Orbit Thread line succeeded Orbit Handoff v1.0.x in v1.1.0.
+Orbit Thread v1.3.0 adds Orbit Next (an optional remote MCP server in `worker/`, never part of the npm package). It is prepared on the `feat/orbit-next-mcp` branch and is **not tagged, published or submitted**; publishing requires human approval of the PR, a production endpoint decision and the checks below plus `npm run test:worker`. Orbit Thread v1.2.2 was a documentation and metadata release that resolves OpenAI plugin submission findings (Terms of Service URL and conversation-starter length). It does not change skill behaviour. v1.2.1 was a compatibility patch for Orbit Resume; v1.2.0 added Resume, and the Orbit Thread line succeeded Orbit Handoff v1.0.x in v1.1.0.
 
-`orbit-thread@1.2.1` is already published. v1.2.2 is a new version.
+`orbit-thread@1.2.1` is already published; v1.2.2 is released. v1.3.0 is a new, unreleased version.
 
 Historical `orbit-handoff@1.0.0`, `orbit-handoff@1.0.1`, `orbit-thread@1.1.0`, `orbit-thread@1.2.0` and `orbit-thread@1.2.1` releases are immutable. Do not republish, unpublish or move their release tags.
 
@@ -39,7 +39,7 @@ orbit-thread-1.2.2.tgz
 dist/orbit-thread-plugin-1.2.2.zip
 ```
 
-The npm tarball should contain 29 files (version 1.2.2, including `TERMS.md`, `lib/resume.mjs` and `plugin/skills/orbit-resume/`). The plugin ZIP should contain 17 files: the portable `plugin.json`, the three canonical skills, the listing icon and the licence, privacy, security and terms documents. Neither should contain tests, `dist/`, credentials or other build residue.
+The npm tarball should contain 36 files (version 1.3.0, including `docs/OPERATIONS.md`, `docs/REVIEW.md`, `TERMS.md`, `lib/resume.mjs` and `plugin/skills/orbit-resume/`). The plugin ZIP should contain 19 files: the portable `plugin.json`, `mcp.json`, `.mcp.json`, `.claude-plugin/plugin.json`, the three canonical skills, the listing icon and the licence, privacy, security and terms documents. Neither should contain tests, `dist/`, credentials or other build residue.
 
 Confirm all three canonical skills are present:
 

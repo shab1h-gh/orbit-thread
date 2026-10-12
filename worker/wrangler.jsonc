@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "orbit-thread-mcp",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": false,
+  "routes": [{ "pattern": "mcp.orbit.convio.io", "custom_domain": true }],
+  "observability": { "enabled": false },
+  "vars": { "ALLOWED_ORIGINS": "https://claude.ai,https://chatgpt.com" },
+  "ratelimits": [{ "name": "LIMITER", "namespace_id": "7301", "simple": { "limit": 30, "period": 60 } }],
+  "env": {
+    "staging": {
+      "name": "orbit-thread-mcp-staging",
+      "workers_dev": true,
+      "routes": [],
+      "observability": { "enabled": false },
+      "vars": { "ALLOWED_ORIGINS": "https://claude.ai,https://chatgpt.com" },
+      "ratelimits": [{ "name": "LIMITER", "namespace_id": "7302", "simple": { "limit": 30, "period": 60 } }]
+    }
+  }
+}

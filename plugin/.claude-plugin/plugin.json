@@ -1,7 +1,7 @@
 {
   "name": "orbit-thread",
   "displayName": "Orbit Thread",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "Token-efficient project setup, checkpoints and coding-session continuity.",
   "author": { "name": "Shabih Anwar", "url": "https://github.com/shab1h-gh" },
   "homepage": "https://github.com/shab1h-gh/orbit-thread",
@@ -12,5 +12,6 @@
   "supportUrl": "https://github.com/shab1h-gh/orbit-thread/issues",
   "privacyPolicyUrl": "https://github.com/shab1h-gh/orbit-thread/blob/main/PRIVACY.md",
   "keywords": ["continuity", "handoff", "resume", "project-setup", "developer-tools"],
-  "skills": "./skills/"
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
 }

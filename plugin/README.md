@@ -23,6 +23,8 @@ Start each coding task in a fresh chat and run Resume once at session start, aut
 
 Handoff is overwrite-only, capped at 50 lines, secret-checked before atomic replacement and makes no network calls or Git mutations. Resume and `npx orbit-thread resume` are read-only and preserve unfinished work.
 
-There is no MCP server, telemetry or external account.
+## Orbit Next (optional remote MCP)
+
+`mcp.json` (portable Agent Plugins 1.0, Streamable HTTP) and `.mcp.json` (Claude Code, URL from `ORBIT_NEXT_URL`) declare the `orbit-next` MCP server. Its three read-only tools inspect **public GitHub repositories**: `get_project_next_actions`, `diagnose_ci_failure` and `assess_release_readiness`. It is separate from the local skills: Resume reads only your local handoff and Git state, while Orbit Next fetches public GitHub metadata for an `owner/repo` you name. It needs no account, uses no AI inference and stores nothing. There is no telemetry.
 
 See the project README for installation, migration and update instructions.

@@ -49,4 +49,35 @@ assert.equal(listing.termsOfServiceURL, 'https://github.com/shab1h-gh/orbit-thre
 assert.equal(fs.existsSync(path.join(root, 'TERMS.md')), true);
 assert.ok(portable.extensions['com.openai'].publication.release_notes.includes(pkg.version), 'release notes mention current version');
 
-console.log('Orbit Thread skills, onboarding metadata, config and implicit invocation validated.');
+// Orbit Next (remote MCP) integration: plugin config, tool contract and dependency isolation.
+const mcp = readJson('plugin/.mcp.json');
+const server = mcp.mcpServers?.['orbit-next'];
+assert.ok(server, 'plugin/.mcp.json must define orbit-next');
+assert.equal(server.type, 'http');
+assert.match(server.url, /^\$\{ORBIT_NEXT_URL:-https:\/\/[a-z0-9.-]+\/mcp\}$/, 'Claude MCP url must be https and end in /mcp');
+assert.equal(Object.keys(mcp.mcpServers).length, 1);
+assert.equal(JSON.stringify(mcp).match(/authorization|bearer|token|secret|key/i), null, 'MCP config must not carry credentials');
+assert.equal(claude.mcpServers, './.mcp.json');
+assert.equal('mcpServers' in portable, false, 'portable plugin.json must not declare mcpServers');
+const portableMcp = readJson('plugin/mcp.json');
+assert.deepEqual(Object.keys(portableMcp).sort(), ['$schema', 'mcpServers']);
+assert.equal(portableMcp.$schema, 'https://agent-plugins.org/schemas/1.0.0/mcp.schema.json');
+const portableServer = portableMcp.mcpServers?.['orbit-next'];
+assert.equal(Object.keys(portableMcp.mcpServers).length, 1);
+assert.equal(portableServer?.type, 'streamable-http');
+assert.deepEqual(Object.keys(portableServer).sort(), ['type', 'url']);
+assert.match(portableServer.url, /^https:\/\/[a-z0-9.-]+\/mcp$/, 'portable MCP url must be a literal https URL ending in /mcp');
+assert.doesNotMatch(portableServer.url, /workers\.dev/, 'no account-derived hostname');
+assert.doesNotMatch(String(pkg.scripts.test), /["']/, 'test glob must be unquoted for Node 20');
+const workerPkg = readJson('worker/package.json');
+assert.equal(workerPkg.version, pkg.version, 'worker version matches package version');
+assert.equal(workerPkg.scripts?.postinstall, undefined);
+assert.equal(pkg.files.some(f => f.startsWith('worker')), false, 'worker/ must not ship in the npm package');
+const toolSource = fs.readFileSync(path.join(root, 'worker/src/tools.ts'), 'utf8');
+const toolNames = [...toolSource.matchAll(/registerTool\('([a-z_]+)'/g)].map(m => m[1]).sort();
+assert.deepEqual(toolNames, ['assess_release_readiness', 'diagnose_ci_failure', 'get_project_next_actions']);
+assert.match(toolSource, new RegExp(`version: '${pkg.version.replace(/\./g, '\\.')}'`), 'MCP server version matches package version');
+for (const name of toolNames) assert.ok(toolSource.includes(`readOnlyHint`), `${name} read-only annotation`);
+assert.ok(portable.extensions['com.openai'].interface.longDescription.includes('Orbit Next'), 'listing describes Orbit Next');
+
+console.log('Orbit Thread skills, onboarding metadata, config, implicit invocation and Orbit Next MCP wiring validated.');
