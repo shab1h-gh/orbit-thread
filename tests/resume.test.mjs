@@ -169,3 +169,70 @@ test('sensitive content under the legacy heading is redacted and the handoff sta
   assert.doesNotMatch(result.stdout, /legacysecret|in vault/);
   assert.equal(fs.readFileSync(path.join(root, 'HANDOFF-STATE.md'), 'utf8'), text);
 });
+
+function sectionOutput(stdout, label) {
+  const lines = stdout.split('\n');
+  const start = lines.indexOf(`${label}:`);
+  const out = [];
+  for (let i = start + 1; i < lines.length && lines[i].startsWith('  '); i++) out.push(lines[i].trim());
+  return out;
+}
+const multi = (eol = '\n') => [
+  '# Handoff State', '', 'Updated: 11-10-2026 10:00', '',
+  '## Current objective', '- Objective one.', '', '- Objective two.', '',
+  '## Completed milestones', '- Done one.', '- Done two.', '- Done three.', '',
+  '## In progress', '- Work one.', '- Work two.', '',
+  '## Open issues / risks', '- Risk one.', '- Risk two.', '',
+  '## Verification', '- Check one.', '- Check two.', '',
+  '## Immediate next steps', '1. Step one.', '2. Step two.', '',
+].join(eol);
+
+for (const [name, eol] of [['LF', '\n'], ['CRLF', '\r\n']]) {
+  test(`resume captures every line of each section (${name})`, t => {
+    const root = fixture(t);
+    fs.writeFileSync(path.join(root, 'HANDOFF-STATE.md'), multi(eol));
+    const result = run(root, 'resume');
+    assert.equal(result.status, 0, result.stderr);
+    assert.doesNotMatch(result.stdout, /\r/);
+    assert.deepEqual(sectionOutput(result.stdout, 'Objective'), ['- Objective one.', '- Objective two.']);
+    assert.deepEqual(sectionOutput(result.stdout, 'Completed milestones'), ['- Done one.', '- Done two.', '- Done three.']);
+    assert.deepEqual(sectionOutput(result.stdout, 'Unfinished work'), ['- Work one.', '- Work two.']);
+    assert.deepEqual(sectionOutput(result.stdout, 'Risks'), ['- Risk one.', '- Risk two.']);
+    assert.deepEqual(sectionOutput(result.stdout, 'Verification'), ['- Check one.', '- Check two.']);
+    assert.deepEqual(sectionOutput(result.stdout, 'Next steps'), ['1. Step one.', '2. Step two.']);
+  });
+}
+
+test('sections stop at the next level-two heading, handle empty and adjacent sections, and read to EOF', t => {
+  const root = fixture(t);
+  const text = '# Handoff State\n\nUpdated: 11-10-2026 10:00\n\n## Current objective\n- Goal.\n## Completed milestones\n## In progress\n- Work.\n### Sub heading\n- Nested kept.\n## Open issues / risks\n\n## Verification\n- Last one.\n- Final line at EOF.';
+  fs.writeFileSync(path.join(root, 'HANDOFF-STATE.md'), text);
+  const result = run(root, 'resume');
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(sectionOutput(result.stdout, 'Objective'), ['- Goal.']);
+  assert.deepEqual(sectionOutput(result.stdout, 'Completed milestones'), ['No verified milestones recorded.']);
+  assert.deepEqual(sectionOutput(result.stdout, 'Unfinished work'), ['- Work.', '### Sub heading', '- Nested kept.']);
+  assert.deepEqual(sectionOutput(result.stdout, 'Risks'), ['No risks recorded.']);
+  assert.deepEqual(sectionOutput(result.stdout, 'Verification'), ['- Last one.', '- Final line at EOF.']);
+});
+
+test('multi-line sections keep the six-entry limit and redaction', t => {
+  const root = fixture(t);
+  const items = Array.from({ length: 9 }, (_, i) => `- Item ${i + 1}.`).join('\n');
+  const text = `# Handoff State\n\nUpdated: 11-10-2026 10:00\n\n## Current objective\n- Goal.\n\n## Completed milestones\n${items}\n\n## In progress\n- Fine line.\n- API_KEY=hunter2value here.\n- Stored the password elsewhere.\n`;
+  fs.writeFileSync(path.join(root, 'HANDOFF-STATE.md'), text);
+  const result = run(root, 'resume');
+  assert.equal(result.status, 0, result.stderr);
+  assert.deepEqual(sectionOutput(result.stdout, 'Completed milestones'), Array.from({ length: 6 }, (_, i) => `- Item ${i + 1}.`));
+  assert.doesNotMatch(result.stdout, /hunter2value|elsewhere/);
+  assert.equal(sectionOutput(result.stdout, 'Unfinished work').length, 3);
+});
+
+test('canonical heading precedence holds for multi-line sections', t => {
+  const root = fixture(t);
+  const text = multi().replace('## In progress', '## Completed this session\n- Legacy one.\n- Legacy two.\n\n## In progress');
+  fs.writeFileSync(path.join(root, 'HANDOFF-STATE.md'), text);
+  const result = run(root, 'resume');
+  assert.deepEqual(sectionOutput(result.stdout, 'Completed milestones'), ['- Done one.', '- Done two.', '- Done three.']);
+  assert.doesNotMatch(result.stdout, /Legacy/);
+});
