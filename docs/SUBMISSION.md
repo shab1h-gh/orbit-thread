@@ -1,15 +1,15 @@
 # Directory submission
 
-Updated 7 October 2026.
+Updated 12 October 2026.
 
 Provider-directory review is separate from npm, GitHub and standalone installation.
 
 ## OpenAI / ChatGPT Plugins Directory
 
-Orbit Thread v1.1.0 is submitted as:
+Orbit Thread v1.2.0 is submitted as:
 
 ```text
-dist/orbit-thread-plugin-1.1.0.zip
+dist/orbit-thread-plugin-1.2.0.zip
 ```
 
 Build it with:
@@ -22,10 +22,10 @@ The ZIP contains portable `plugin.json`, all three canonical skills, OpenAI inte
 
 ### Submission flow
 
-1. Complete release validation and build the final v1.1.0 ZIP from the release commit/tag.
+1. Complete release validation and build the final v1.2.0 ZIP from the release commit/tag.
 2. Open the OpenAI Plugins publisher dashboard:
    `https://platform.openai.com/plugins`
-3. Upload `orbit-thread-plugin-1.1.0.zip`.
+3. Upload `orbit-thread-plugin-1.2.0.zip`.
 4. Complete automated checks and resolve genuine findings.
 5. Review listing metadata and required policy/data-handling declarations.
 6. Choose **Submit for review**.
@@ -63,7 +63,7 @@ claude plugin validate ./plugin --strict
 claude plugin validate . --strict
 ```
 
-Then use the directory management/submission surface in Claude, connect the GitHub account that owns `shab1h-gh/orbit-thread`, select the repository/plugin, complete the listing details and submit it for review. Use the immutable v1.1.0 release/tag once created.
+Then use the directory management/submission surface in Claude, connect the GitHub account that owns `shab1h-gh/orbit-thread`, select the repository/plugin, complete the listing details and submit it for review. Use the immutable v1.2.0 release/tag once created.
 
 A successful GitHub marketplace installation does not mean the plugin is approved for Anthropic's public directory.
 

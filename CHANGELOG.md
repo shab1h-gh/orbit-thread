@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0 — 12 October 2026
+
+- Add **Orbit Resume**, a third canonical skill that recovers project context at the start of a fresh Codex or Claude Code session from the latest usable handoff, current Git state and only the living docs the task needs.
+- Add read-only `npx orbit-thread resume` for a concise terminal summary of handoff, Git state and next action.
+- Invoke manually with `$orbit-resume` (Codex), `/orbit-resume` (Claude Code) or `/orbit-thread:orbit-resume` (Claude marketplace plugin). Invocation can also be automatic where the host supports implicit skill invocation (`allow_implicit_invocation: true`); manual invocation is the documented fallback.
+- Treat the handoff as a lead: current Git state and tracked docs override stale details, and missing, malformed, stale or future-dated handoffs are reported rather than guessed.
+- Security safeguards: Resume is read-only and never resets, cleans, stashes, stages, commits or otherwise changes the working tree; it strips terminal-control sequences from displayed repository and handoff text, redacts secret-looking values, and does not read `.env` files, credentials or unrelated files.
+- Install, update, Doctor and uninstall now manage all three skills (`handoff`, `orbit-setup`, `orbit-resume`) for both agents.
+- Backwards compatible: existing v1.1.0 installations, `HANDOFF-STATE.md` files, `.orbit-thread/config.json` and living docs keep working unchanged; `orbit-thread update` adds Resume without touching locally edited managed files, and `orbit-handoff` remains a CLI alias.
+
 ## 1.1.0 — 7 October 2026
 
 - Rename the product from **Orbit Handoff** to **Orbit Thread**.

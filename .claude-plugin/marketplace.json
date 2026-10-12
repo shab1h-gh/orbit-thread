@@ -1,14 +1,14 @@
 {
   "name": "orbit-thread",
   "owner": { "name": "Shabih Anwar" },
-  "metadata": { "description": "Orbit Thread — efficient coding-project continuity", "version": "1.1.0" },
+  "metadata": { "description": "Orbit Thread — efficient coding-project continuity", "version": "1.2.0" },
   "plugins": [
     {
       "name": "orbit-thread",
       "displayName": "Orbit Thread",
       "source": "./plugin",
       "description": "Set up lean project continuity and carry verified coding state between sessions.",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "author": { "name": "Shabih Anwar" },
       "category": "development",
       "tags": ["continuity", "handoff", "resume", "project-setup", "skills"]

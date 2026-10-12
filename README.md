@@ -328,7 +328,7 @@ The update command protects locally edited managed skill files. Setup updates ma
 
 ### Moving from Orbit Handoff 1.0.x
 
-Orbit Thread is the successor to **Orbit Handoff**. The v1.1 CLI recognises compatible older managed installations and state while preserving local edits.
+Orbit Thread is the successor to **Orbit Handoff**. The v1.1 and later CLI recognises compatible older managed installations and state while preserving local edits.
 
 ```bash
 npx orbit-thread@latest update --agent both --scope project --yes

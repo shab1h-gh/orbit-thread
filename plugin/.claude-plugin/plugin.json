@@ -1,7 +1,7 @@
 {
   "name": "orbit-thread",
   "displayName": "Orbit Thread",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Token-efficient project setup, checkpoints and coding-session continuity.",
   "author": { "name": "Shabih Anwar", "url": "https://github.com/shab1h-gh" },
   "homepage": "https://github.com/shab1h-gh/orbit-thread",

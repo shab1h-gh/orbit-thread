@@ -1,6 +1,6 @@
 {
   "name": "orbit-thread",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Token-efficient project setup, checkpoints and coding-session continuity for Codex and Claude Code.",
   "type": "module",
   "bin": {
