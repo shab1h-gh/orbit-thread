@@ -237,3 +237,15 @@ regression test confirms they do not reach terminal output.
 - Merge PR #3, then tag v1.2.0 from the merged release commit.
 - Publish `orbit-thread@1.2.0` and repeat the public-registry smoke test described in
   [PUBLISHING.md](PUBLISHING.md).
+
+## Orbit Resume v1.2.1 validation
+
+Compatibility patch (`fix/resume-completed-heading`): Resume now accepts `## Completed this session` as an alias of the canonical `## Completed milestones`. The canonical section takes precedence when both exist; the handoff format is unchanged. The v1.2.0 section above is a historical record and is unchanged.
+
+### Verified locally
+
+Results are recorded in the release PR and final report; the checks run were `npm test` (including regression tests for both headings, precedence, missing sections and redaction under the legacy heading), `npm run validate`, `npm run scan:public`, `npm run build:plugin`, `npm pack`, `npm run smoke:pack`, `claude plugin validate ./plugin --strict`, `claude plugin validate . --strict` and `git diff --check`.
+
+### Compatibility with v1.2.0 installations
+
+A project installed with the published `orbit-thread@1.2.0` is updated in place by the 1.2.1 CLI; installed skills, `.orbit-thread/config.json`, living docs and existing handoffs are preserved.

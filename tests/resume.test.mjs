@@ -129,3 +129,43 @@ test('oversized and symlink handoffs are rejected without reading their target',
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /Handoff: invalid — larger than the 32 KB safety limit/);
 });
+
+const withCompleted = (heading, body = '- Added the base route.') => handoff('11-10-2026 10:00').replace(/## Completed milestones\n- Added the base route\.\n/, heading ? `## ${heading}\n${body}\n` : '');
+
+test('legacy "Completed this session" heading is recognised as completed milestones', t => {
+  const root = fixture(t);
+  fs.writeFileSync(path.join(root, 'HANDOFF-STATE.md'), withCompleted('Completed this session', '- Shipped the legacy-heading item.'));
+  const result = run(root, 'resume');
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /Completed milestones:[\s\S]*Shipped the legacy-heading item/);
+  assert.doesNotMatch(result.stdout, /No verified milestones recorded/);
+});
+
+test('canonical heading is preferred and entries are not duplicated when both exist', t => {
+  const root = fixture(t);
+  const both = withCompleted('Completed milestones', '- Canonical entry.').replace('## In progress', '## Completed this session\n- Legacy entry.\n\n## In progress');
+  fs.writeFileSync(path.join(root, 'HANDOFF-STATE.md'), both);
+  const result = run(root, 'resume');
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /Canonical entry/);
+  assert.doesNotMatch(result.stdout, /Legacy entry/);
+  assert.equal(result.stdout.match(/Canonical entry/g).length, 1);
+});
+
+test('missing completed sections still report no verified milestones', t => {
+  const root = fixture(t);
+  fs.writeFileSync(path.join(root, 'HANDOFF-STATE.md'), withCompleted(null));
+  const result = run(root, 'resume');
+  assert.equal(result.status, 0, result.stderr);
+  assert.match(result.stdout, /No verified milestones recorded/);
+});
+
+test('sensitive content under the legacy heading is redacted and the handoff stays unmodified', t => {
+  const root = fixture(t);
+  const text = withCompleted('Completed this session', '- Rotated API_KEY=legacysecret today.\n- Stored the password in vault.');
+  fs.writeFileSync(path.join(root, 'HANDOFF-STATE.md'), text);
+  const result = run(root, 'resume');
+  assert.equal(result.status, 0, result.stderr);
+  assert.doesNotMatch(result.stdout, /legacysecret|in vault/);
+  assert.equal(fs.readFileSync(path.join(root, 'HANDOFF-STATE.md'), 'utf8'), text);
+});
