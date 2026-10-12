@@ -3,6 +3,7 @@
 ## 1.2.1 — 12 October 2026
 
 - Fix Orbit Resume reporting "No verified milestones recorded" for valid handoffs that use `## Completed this session`. Resume now reads both headings.
+- Fix Orbit Resume reading only the first line of each handoff section; every section now runs to the next `##` heading or the end of the file (LF and CRLF), still capped at six entries.
 - `## Completed milestones` remains the canonical heading; when both exist the canonical section wins and entries are not duplicated.
 - No change to the handoff format, read-only behaviour, redaction, stale-handoff detection, 50-line limit or Git safety. Existing v1.2.0 installations and handoffs keep working; `orbit-thread update` refreshes the version.
 
