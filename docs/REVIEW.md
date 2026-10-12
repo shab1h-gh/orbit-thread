@@ -39,7 +39,7 @@ Orbit Next is a remote, read-only MCP server (Streamable HTTP, stateless, no acc
 ## Reproducible demo (about two minutes)
 
 ```sh
-claude plugin marketplace add shab1h-gh/orbit-thread   # after v1.3.0 is merged
+claude plugin marketplace add shab1h-gh/orbit-thread   # v1.3.0 is published
 claude plugin install orbit-thread@orbit-thread
 claude mcp list        # plugin:orbit-thread:orbit-next … Connected
 ```
@@ -48,14 +48,22 @@ Then ask: *"Using Orbit Next, diagnose `cli/cli` Actions run 37915254425, then t
 
 ## <a id="codex"></a>Codex
 
-Not tested here (no Codex CLI available). Expected commands, to verify before relying on them:
+**Verified (Codex CLI, production endpoint):** Codex CLI connected to `https://mcp.orbit.convio.io/mcp` and invoked all three tools.
+
+| Tool | Result |
+| :--- | :--- |
+| `get_project_next_actions` | PASS |
+| `assess_release_readiness` | PASS |
+| `diagnose_ci_failure` | PASS: used `cli/cli` Actions run 37915254425; identified the failed `govulncheck` job and step without claiming an unverified root cause. |
+
+Connection commands (as used for the MCP server):
 
 ```sh
 codex mcp add orbit-next --url https://mcp.orbit.convio.io/mcp
 codex mcp list
 ```
 
-The packaged `plugin/mcp.json` follows the Agent Plugins 1.0 schema (validated with Ajv 2020-12). Codex plugin installation of the combined ZIP is also untested.
+**Still untested:** installing the combined portable plugin ZIP in Codex. The packaged `plugin/mcp.json` follows the Agent Plugins 1.0 schema (validated with Ajv 2020-12), but Codex plugin installation has not been exercised.
 
 ## Compatibility facts
 

@@ -2,12 +2,12 @@
 
 ## Now
 
-- [x] v1.3.0: Orbit Next read-only MCP (next actions, CI diagnosis, release readiness) on a staging Worker.
+- [x] v1.3.0: Orbit Next read-only MCP (next actions, CI diagnosis, release readiness) on a staging Worker, then promoted to production.
 - [x] Production endpoint `https://mcp.orbit.convio.io/mcp` deployed on a Worker Custom Domain and set in both `plugin/mcp.json` and `plugin/.mcp.json`.
 - [x] All three tools verified on the live endpoint (rate limit had reset); `worker/scripts/e2e.mjs` now separates protocol/security from functional checks and can never report a rate-limited run as a pass.
-- [x] Optional operator-held `GITHUB_TOKEN` support implemented in the Worker (not yet configured in production; manual step in [OPERATIONS](OPERATIONS.md)).
-- [ ] Deploy the token-aware Worker to production and set the secret (owner action).
-- [ ] Review and merge the v1.3.0 pull request; tag and publish only after human approval.
+- [x] Optional operator-held `GITHUB_TOKEN` support implemented in the Worker; token-aware Worker deployed to production and the secret configured by the owner (procedure in [OPERATIONS](OPERATIONS.md)).
+- [x] PR #7 merged; v1.3.0 tagged and published.
+- [x] Codex CLI connected to the production endpoint and invoked all three tools successfully (see [REVIEW](REVIEW.md#codex)). Portable plugin ZIP installation in Codex remains untested.
 
 ## Next
 
