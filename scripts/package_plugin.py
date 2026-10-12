@@ -18,7 +18,7 @@ with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as archive:
             info.external_attr = 0o100644 << 16
             archive.writestr(info, file.read_bytes())
 
-    for name in ('LICENSE', 'PRIVACY.md', 'SECURITY.md'):
+    for name in ('LICENSE', 'PRIVACY.md', 'SECURITY.md', 'TERMS.md'):
         if (root / 'plugin' / name).exists():
             continue
         info = zipfile.ZipInfo(name, (2026, 10, 7, 0, 0, 0))

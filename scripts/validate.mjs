@@ -43,4 +43,10 @@ for (const [key, limit] of Object.entries({ displayName: 30, shortDescription: 3
   assert.ok(typeof listing[key] === 'string' && listing[key].length > 0 && listing[key].length <= limit, key);
 }
 
+assert.ok(Array.isArray(listing.defaultPrompt) && listing.defaultPrompt.length >= 1 && listing.defaultPrompt.length <= 3, 'defaultPrompt count');
+for (const prompt of listing.defaultPrompt) assert.ok(prompt.length > 0 && prompt.length <= 128, `defaultPrompt over 128 characters: ${prompt}`);
+assert.equal(listing.termsOfServiceURL, 'https://github.com/shab1h-gh/orbit-thread/blob/main/TERMS.md');
+assert.equal(fs.existsSync(path.join(root, 'TERMS.md')), true);
+assert.ok(portable.extensions['com.openai'].publication.release_notes.includes(pkg.version), 'release notes mention current version');
+
 console.log('Orbit Thread skills, onboarding metadata, config and implicit invocation validated.');

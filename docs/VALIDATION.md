@@ -249,3 +249,24 @@ Results are recorded in the release PR and final report; the checks run were `np
 ### Compatibility with v1.2.0 installations
 
 A project installed with the published `orbit-thread@1.2.0` is updated in place by the 1.2.1 CLI; installed skills, `.orbit-thread/config.json`, living docs and existing handoffs are preserved.
+
+## Orbit Thread v1.2.2 validation
+
+Documentation and metadata release (`release/v1.2.2`) resolving OpenAI plugin submission findings. The v1.2.1 section above is a historical record and is unchanged.
+
+### Changes under validation
+
+- `TERMS.md` is the public Terms of Service, linked from `README.md` and declared as `termsOfServiceURL` in `plugin/plugin.json`.
+- `defaultPrompt` now holds three conversation starters, each at most 128 characters.
+- The stale `publication.release_notes` text (which described v1.1) now describes v1.2.2.
+- `TERMS.md` is included in the npm tarball (29 files) and the plugin ZIP (17 files).
+- `npm run validate` additionally enforces the Terms URL, the prompt count and the 128-character limit.
+- No change to Setup, Handoff or Resume code, skill files, installer logic or the handoff format. No MCP server is added.
+
+### Verified locally
+
+Results are recorded in the release PR and final report. Checks run: `npm test`, `npm run validate`, `npm run scan:public`, `npm run build:plugin`, `npm pack`, `npm run smoke:pack`, `claude plugin validate ./plugin --strict`, `claude plugin validate . --strict` and `git diff --check`.
+
+### Compatibility
+
+Existing v1.2.x installations keep working; `orbit-thread update` refreshes managed skills to 1.2.2 without touching locally edited files. Authenticated native Codex and Claude sessions were not re-run for this metadata-only release.

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.2 — 12 October 2026
+
+- Add a public [Terms of Service](TERMS.md) and declare it as `termsOfServiceURL` in the OpenAI plugin manifest.
+- Replace the single long conversation starter with three short ones (each under 128 characters) covering Setup, Handoff and Resume.
+- Correct the stale `publication.release_notes` text in the OpenAI manifest, which still described v1.1.
+- Ship `TERMS.md` in the npm package and the plugin ZIP, and make `npm run validate` check the Terms URL and conversation-starter limits.
+- Documentation and metadata release only: no change to Setup, Handoff or Resume behaviour, the handoff format, installer logic or the three canonical skills. Existing installations keep working; `orbit-thread update` refreshes the version.
+
 ## 1.2.1 — 12 October 2026
 
 - Fix Orbit Resume reporting "No verified milestones recorded" for valid handoffs that use `## Completed this session`. Resume now reads both headings.
