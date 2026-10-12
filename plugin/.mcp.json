@@ -2,7 +2,7 @@
   "mcpServers": {
     "orbit-next": {
       "type": "http",
-      "url": "${ORBIT_NEXT_URL:-https://orbit-next.invalid/mcp}"
+      "url": "${ORBIT_NEXT_URL:-https://mcp.orbit.convio.io/mcp}"
     }
   }
 }

@@ -9,7 +9,7 @@
 - Security: GET-only GitHub access to two fixed hosts, strict owner/repo/run-id validation, an allowlist of fetchable file paths pinned to a commit SHA, no redirects, size/time/request budgets, output sanitisation and secret redaction, Origin checks, a request-size cap and a per-IP rate limit. No credentials, database, telemetry or AI inference.
 - Plugin: add portable `plugin/mcp.json` (Agent Plugins 1.0, `streamable-http`) and Claude-only `plugin/.mcp.json` (endpoint from `ORBIT_NEXT_URL`, referenced from `.claude-plugin/plugin.json`); the portable manifest declares no `mcpServers`. `npm test` uses an unquoted glob so Node 20 finds the tests. Setup, Handoff, Resume, the npm CLI and the installer are unchanged; the CLI still has no dependencies and `worker/` is not shipped in the npm package.
 - Tooling: `npm run validate` checks the MCP wiring and tool contract, `npm run scan:public` rejects private `workers.dev` hosts and Cloudflare account IDs, CI gains a Worker job (audit, typecheck, tests, dry-run deploy), and the root test script is scoped to `tests/*.test.mjs`.
-- Docs: README, ARCHITECTURE, DESIGN, ROADMAP, AGENTS, SECURITY, PRIVACY, TERMS, SUBMISSION, VALIDATION and PUBLISHING updated. No public production endpoint is published by this release.
+- Docs: README, ARCHITECTURE, DESIGN, ROADMAP, AGENTS, SECURITY, PRIVACY, TERMS, SUBMISSION, VALIDATION and PUBLISHING updated. Production endpoint: `https://mcp.orbit.convio.io/mcp`.
 
 ## 1.2.2 — 12 October 2026
 

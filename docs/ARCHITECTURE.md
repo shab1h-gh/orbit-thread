@@ -36,10 +36,10 @@ MCP client ──HTTPS──▶ Worker /mcp ──GET──▶ api.github.com   
 
 ### Deployment
 
-`wrangler.jsonc` defines the production name `orbit-thread-mcp` and a `staging` environment (`orbit-thread-mcp-staging`). Neither binds storage; the only binding is a Cloudflare rate limiter. Production is not deployed by this repository's CI.
+`wrangler.jsonc` defines the production name `orbit-thread-mcp` and a `staging` environment (`orbit-thread-mcp-staging`). Neither binds storage; the only binding is a Cloudflare rate limiter. Production (`orbit-thread-mcp`) is served only from the Custom Domain `mcp.orbit.convio.io` (`workers_dev` is off), deployed manually with `wrangler deploy --env=""`; this repository's CI never deploys.
 
 ### Plugin wiring
 
-MCP packaging is split by client. `plugin/mcp.json` is the portable Agent Plugins 1.0 file (`$schema`, `streamable-http`, a literal HTTPS URL; discovered at the plugin root, never referenced from the portable `plugin.json`, which declares no `mcpServers`). `plugin/.mcp.json` is the Claude Code configuration (type `http`, URL `${ORBIT_NEXT_URL:-…}`), referenced only by `.claude-plugin/plugin.json`. Both point at the same placeholder (`orbit-next.invalid`) until the production endpoint is decided.
+MCP packaging is split by client. `plugin/mcp.json` is the portable Agent Plugins 1.0 file (`$schema`, `streamable-http`, a literal HTTPS URL; discovered at the plugin root, never referenced from the portable `plugin.json`, which declares no `mcpServers`). `plugin/.mcp.json` is the Claude Code configuration (type `http`, URL `${ORBIT_NEXT_URL:-…}`), referenced only by `.claude-plugin/plugin.json`. Both point at the production endpoint `https://mcp.orbit.convio.io/mcp` (a Cloudflare Worker Custom Domain on the `orbit-thread-mcp` Worker); the Claude file keeps `ORBIT_NEXT_URL` as an override for staging or self-hosting.
 
 Optional server-side GitHub authentication (not implemented): a Worker secret holding a read-only token would raise the GitHub rate limit for every caller without any client credentials; portable config must never carry tokens or headers with secrets. It needs a threat-model review (token scope, cache-key isolation, no echo in errors) before adoption.

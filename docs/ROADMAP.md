@@ -3,7 +3,8 @@
 ## Now
 
 - [x] v1.3.0: Orbit Next read-only MCP (next actions, CI diagnosis, release readiness) on a staging Worker.
-- [ ] Choose and publish a production endpoint on a custom domain, then set the default in both `plugin/mcp.json` (literal URL) and `plugin/.mcp.json`.
+- [x] Production endpoint `https://mcp.orbit.convio.io/mcp` deployed on a Worker Custom Domain and set in both `plugin/mcp.json` and `plugin/.mcp.json`.
+- [ ] Re-verify all three tools on the live endpoint once GitHub's shared-egress rate limit has reset (it was exhausted during the first production check).
 - [ ] Review and merge the v1.3.0 pull request; tag and publish only after human approval.
 
 ## Next

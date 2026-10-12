@@ -289,7 +289,9 @@ Run on 12 October 2026, macOS, Node.js 24.16.0. v1.2.2 files are unchanged apart
 
 Findings during validation: (1) `redirect: 'error'` is not usable in the Workers runtime and made every GitHub call fail on the deployed Worker while mocked tests passed; fixed with `redirect: 'manual'` plus an explicit redirect error and a test. (2) GitHub's unauthenticated limit was exhausted from the shared Cloudflare egress during testing; the tools returned a clear rate-limit error with a retry hint, as designed.
 
-Not verified: a production endpoint (none exists), Codex native MCP loading of `plugin/.mcp.json` (no Codex CLI available), and authenticated GitHub behaviour (out of scope).
+Production (2026-10-12): `orbit-thread-mcp` deployed to `https://mcp.orbit.convio.io/mcp`. DNS, TLS, `/health`, `initialize`, `tools/list`, input rejection, 403 foreign Origin and 405 GET passed. The three `tools/call` requests reached the Worker but returned the designed rate-limit error because GitHub's unauthenticated limit was exhausted for the shared egress IP, so a successful production tool result is not yet verified.
+
+Not verified: Codex native MCP loading of `plugin/.mcp.json` (no Codex CLI available), and authenticated GitHub behaviour (out of scope).
 
 ### PR #7 repair (portable MCP packaging, Node 20 test glob)
 

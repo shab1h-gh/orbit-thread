@@ -3,7 +3,7 @@
   "mcpServers": {
     "orbit-next": {
       "type": "streamable-http",
-      "url": "https://orbit-next.invalid/mcp"
+      "url": "https://mcp.orbit.convio.io/mcp"
     }
   }
 }

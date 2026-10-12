@@ -75,7 +75,7 @@ Provider dashboard state wins over repository documentation. Update these instru
 
 v1.3.0 adds `plugin/.mcp.json` and an optional remote, read-only MCP service. Before any provider submission of v1.3.0:
 
-1. Choose a production endpoint (a custom domain is recommended; account-derived `workers.dev` hosts reveal the account name), deploy the production Worker and set the literal URL in `plugin/mcp.json` and the default in `plugin/.mcp.json`.
+1. Production endpoint is live at `https://mcp.orbit.convio.io/mcp` and set in `plugin/mcp.json` and `plugin/.mcp.json`; re-run `worker/scripts/e2e.mjs` against it before submitting.
 2. Provider declarations: the service processes only the `owner`/`repo`/`run_id` supplied by the user, fetches public GitHub data, requires no authentication, stores nothing and adds no telemetry; see [PRIVACY.md](../PRIVACY.md) (section "Orbit Next") and [SECURITY.md](../SECURITY.md). Tools are annotated read-only and open-world.
 3. Provider review of remote MCP servers is separate from the plugin skills ZIP and may need extra metadata (endpoint ownership, test instructions, tool descriptions). Do not describe the MCP as available until the endpoint is public and monitored.
 4. Rebuild the ZIP from the release commit: `npm run build:plugin` (includes `mcp.json` and `.mcp.json`).

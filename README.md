@@ -81,7 +81,7 @@ node scripts/e2e.mjs https://<your-worker-host>/mcp   # end-to-end check
 - **Costs:** none for users. The Worker uses no paid AI APIs, database or storage; it runs on Cloudflare's free tier for modest traffic.
 - **GitHub rate limits:** Orbit Next sends **no credentials**, so GitHub's unauthenticated limit (60 requests/hour per IP, shared by all callers from the same Cloudflare egress) applies. Each call uses roughly 4–9 requests, with a 5-minute cache. When the limit is hit, the tool returns a clear rate-limit error with a retry hint. Expect this to bite during busy periods.
 - **Limits:** public repositories only; first page of PRs (30) and issues (50); GitHub Actions only; workflow logs need authentication and are not read; no write actions; no private data.
-- **Not included:** an authenticated mode (see [roadmap](docs/ROADMAP.md)), a published production endpoint, and any directory listing for the MCP server.
+- **Not included:** an authenticated mode (see [roadmap](docs/ROADMAP.md)), a directory listing for the MCP server.
 
 Architecture and threat model: [ARCHITECTURE](docs/ARCHITECTURE.md) · [SECURITY](SECURITY.md) · [PRIVACY](PRIVACY.md).
 
