@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "orbit-thread",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Token-efficient project setup, checkpoints and coding-session continuity.",
   "author": { "name": "Shabih Anwar", "url": "https://github.com/shab1h-gh" },
   "homepage": "https://github.com/shab1h-gh/orbit-thread",

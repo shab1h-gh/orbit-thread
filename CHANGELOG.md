@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1 — 12 October 2026
+
+- Fix Orbit Resume reporting "No verified milestones recorded" for valid handoffs that use `## Completed this session`. Resume now reads both headings.
+- `## Completed milestones` remains the canonical heading; when both exist the canonical section wins and entries are not duplicated.
+- No change to the handoff format, read-only behaviour, redaction, stale-handoff detection, 50-line limit or Git safety. Existing v1.2.0 installations and handoffs keep working; `orbit-thread update` refreshes the version.
+
 ## 1.2.0 — 12 October 2026
 
 - Add **Orbit Resume**, a third canonical skill that recovers project context at the start of a fresh Codex or Claude Code session from the latest usable handoff, current Git state and only the living docs the task needs.
