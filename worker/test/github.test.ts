@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { GitHubClient, GitHubError } from '../src/github.js';
+import { GitHubClient, GitHubError, resetGitHubState } from '../src/github.js';
 import { mockGitHub, SHA } from './helpers.js';
 
 describe('GitHub client', () => {
@@ -31,6 +31,7 @@ describe('GitHub client', () => {
     await expect(c.jsonOrNull('/repos/o/missing')).resolves.toBeNull();
     await expect(c.json('/repos/o/rl')).rejects.toMatchObject({ kind: 'rate_limited' });
     await expect(c.json('/repos/o/many')).rejects.toMatchObject({ kind: 'rate_limited' });
+    resetGitHubState(); // a known-exhausted quota intentionally fails fast
     await expect(c.json('/repos/o/priv')).rejects.toMatchObject({ kind: 'forbidden' });
     await expect(c.json('/repos/o/five')).rejects.toMatchObject({ kind: 'upstream' });
   });

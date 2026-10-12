@@ -71,7 +71,13 @@ test('worker source is read-only by construction', () => {
   for (const f of fs.readdirSync(dir)) {
     const src = fs.readFileSync(path.join(dir, f), 'utf8');
     assert.doesNotMatch(src, /method:\s*['"](?:POST|PUT|PATCH|DELETE)['"]/i, `${f} must not issue mutating requests`);
-    assert.doesNotMatch(src, /\bauthorization\b/i, `${f} must not send credentials`);
+    // The only approved credential: the optional operator token, attached by github.ts alone, behind an explicit flag.
+    if (f === 'github.ts') {
+      assert.equal(src.match(/authorization\s*=/gi)?.length, 1, 'exactly one place may attach credentials');
+      assert.match(src, /if \(withToken && this\.token\) headers\.authorization/);
+      assert.match(src, /const useToken = isApi && /, 'token use is restricted to api.github.com');
+      assert.doesNotMatch(src, /console\.(?:log|warn|error|info)\([^)]*token(?!_rejected)/i, 'token must never be logged');
+    } else assert.doesNotMatch(src, /\bauthorization\b/i, `${f} must not send credentials`);
     assert.doesNotMatch(src, /\beval\(|new Function\(|child_process/, `${f} must not execute retrieved content`);
     assert.doesNotMatch(src, /HANDOFF-STATE/, `${f} must not reference the local handoff file`);
   }

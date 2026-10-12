@@ -76,8 +76,8 @@ Provider dashboard state wins over repository documentation. Update these instru
 v1.3.0 adds `plugin/.mcp.json` and an optional remote, read-only MCP service. Before any provider submission of v1.3.0:
 
 1. Production endpoint is live at `https://mcp.orbit.convio.io/mcp` and set in `plugin/mcp.json` and `plugin/.mcp.json`; re-run `worker/scripts/e2e.mjs` against it before submitting.
-2. Provider declarations: the service processes only the `owner`/`repo`/`run_id` supplied by the user, fetches public GitHub data, requires no authentication, stores nothing and adds no telemetry; see [PRIVACY.md](../PRIVACY.md) (section "Orbit Next") and [SECURITY.md](../SECURITY.md). Tools are annotated read-only and open-world.
+2. Provider declarations: the service processes only the `owner`/`repo`/`run_id` supplied by the user, fetches public GitHub data, requires no user authentication (the operator may configure an optional read-only, public-repositories-only GitHub token as a Cloudflare secret, never exposed to users), stores nothing and adds no telemetry; see [PRIVACY.md](../PRIVACY.md) (section "Orbit Next") and [SECURITY.md](../SECURITY.md). Tools are annotated read-only and open-world.
 3. Provider review of remote MCP servers is separate from the plugin skills ZIP and may need extra metadata (endpoint ownership, test instructions, tool descriptions). Do not describe the MCP as available until the endpoint is public and monitored.
 4. Rebuild the ZIP from the release commit: `npm run build:plugin` (includes `mcp.json` and `.mcp.json`).
 
-Nothing in v1.3.0 has been submitted to OpenAI or Anthropic.
+Review materials (tool descriptions, positive/negative cases, demo): [REVIEW.md](REVIEW.md). Operations: [OPERATIONS.md](OPERATIONS.md). Nothing in v1.3.0 has been submitted to OpenAI or Anthropic.

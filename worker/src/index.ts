@@ -4,6 +4,8 @@ import { createServer, SERVER_INFO } from './tools.js';
 
 export interface Env {
   ALLOWED_ORIGINS?: string;
+  /** Optional Cloudflare secret: read-only GitHub token limited to public repositories. Never logged or returned. */
+  GITHUB_TOKEN?: string;
   LIMITER?: { limit(o: { key: string }): Promise<{ success: boolean }> };
 }
 
@@ -38,7 +40,7 @@ export async function handle(request: Request, env: Env, deps: { client?: () => 
   const cors: Record<string, string> = origin ? { 'access-control-allow-origin': origin, vary: 'Origin' } : {};
 
   if (request.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers: { ...SECURITY_HEADERS, ...cors, 'access-control-allow-methods': 'POST, OPTIONS', 'access-control-allow-headers': 'content-type, accept, mcp-protocol-version', 'access-control-max-age': '600' } });
+    return new Response(null, { status: 204, headers: { ...SECURITY_HEADERS, ...cors, 'access-control-allow-methods': 'POST, OPTIONS', 'access-control-allow-headers': 'content-type, accept, mcp-protocol-version, mcp-session-id, last-event-id', 'access-control-max-age': '600' } });
   }
   // Stateless server: no server-initiated streams and no sessions to terminate.
   if (request.method !== 'POST') return rpcError(405, -32000, 'Method not allowed. This stateless MCP endpoint accepts POST only.', { allow: 'POST, OPTIONS', ...cors });
@@ -53,7 +55,7 @@ export async function handle(request: Request, env: Env, deps: { client?: () => 
     try { if (!(await env.LIMITER.limit({ key })).success) return rpcError(429, -32000, 'Too many requests. Slow down and retry shortly.', { 'retry-after': '30', ...cors }); } catch { /* limiter unavailable: fail open, upstream limits still apply */ }
   }
 
-  const server = createServer(deps.client ?? (() => new GitHubClient()));
+  const server = createServer(deps.client ?? (() => new GitHubClient({ token: env.GITHUB_TOKEN })));
   const transport = new WebStandardStreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true, maxRequestBodySize: MAX_BODY });
   try {
     await server.connect(transport);

@@ -71,7 +71,7 @@ The Worker lives in [`worker/`](worker) with its own `package.json`, so the npm 
 ```bash
 cd worker
 npm ci --ignore-scripts
-npm test                       # 90 mocked-GitHub tests, real MCP client included
+npm test                       # mocked-GitHub tests, real MCP client included
 npx wrangler deploy --env staging   # needs your own Cloudflare login
 node scripts/e2e.mjs https://<your-worker-host>/mcp   # end-to-end check
 ```
@@ -79,9 +79,11 @@ node scripts/e2e.mjs https://<your-worker-host>/mcp   # end-to-end check
 ### Status and costs
 
 - **Costs:** none for users. The Worker uses no paid AI APIs, database or storage; it runs on Cloudflare's free tier for modest traffic.
-- **GitHub rate limits:** Orbit Next sends **no credentials**, so GitHub's unauthenticated limit (60 requests/hour per IP, shared by all callers from the same Cloudflare egress) applies. Each call uses roughly 4–9 requests, with a 5-minute cache. When the limit is hit, the tool returns a clear rate-limit error with a retry hint. Expect this to bite during busy periods.
+- **GitHub rate limits:** you never supply credentials. By default the Worker calls GitHub unauthenticated (60 requests/hour per IP, shared by all callers from the same Cloudflare egress). The operator can add an optional read-only, public-repositories-only token as a Cloudflare secret to raise this (5,000/hour); see [OPERATIONS](docs/OPERATIONS.md). Each call uses roughly 4–9 requests, with a 5-minute cache, bounded concurrency and a request budget. When the limit is hit the tool returns a clear rate-limit error with a retry hint, never a partial result presented as complete.
 - **Limits:** public repositories only; first page of PRs (30) and issues (50); GitHub Actions only; workflow logs need authentication and are not read; no write actions; no private data.
-- **Not included:** an authenticated mode (see [roadmap](docs/ROADMAP.md)), a directory listing for the MCP server.
+- **Not included:** per-user GitHub authentication or private repositories, workflow logs, a directory listing for the MCP server.
+- **Local Resume vs Orbit Next:** `orbit-resume` and `npx orbit-thread resume` run on your machine, read your handoff and Git state and make no network calls. Orbit Next runs remotely, sees only the public `owner/repo` you pass, and cannot see local files, branches or `HANDOFF-STATE.md`.
+- **Verify an install:** `claude mcp list` should show `plugin:orbit-thread:orbit-next … Connected`. Codex: see [docs/REVIEW.md](docs/REVIEW.md#codex).
 
 Architecture and threat model: [ARCHITECTURE](docs/ARCHITECTURE.md) · [SECURITY](SECURITY.md) · [PRIVACY](PRIVACY.md).
 

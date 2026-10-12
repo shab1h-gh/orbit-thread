@@ -278,7 +278,7 @@ Run on 12 October 2026, macOS, Node.js 24.16.0. v1.2.2 files are unchanged apart
 | Check | Result |
 | :--- | :--- |
 | `npm test` (CLI/skills + Orbit Next wiring) | 57 pass: the 52 existing tests plus 5 new, 0 fail |
-| `npm run test:worker` (vitest, mocked GitHub) | 90 pass: validation, sanitisation, GitHub client, analysers, MCP via the official SDK client, HTTP hardening |
+| `npm run test:worker` (vitest, mocked GitHub) | 100 pass: validation, sanitisation, GitHub client, analysers, MCP via the official SDK client, HTTP hardening |
 | `npm run typecheck:worker` | clean (`tsc --noEmit`, strict) |
 | `npm audit` in `worker/` | 0 vulnerabilities |
 | `npm run validate` / `scan:public` | pass (69 files); ZIP contents scanned separately (18 files) |
@@ -289,9 +289,15 @@ Run on 12 October 2026, macOS, Node.js 24.16.0. v1.2.2 files are unchanged apart
 
 Findings during validation: (1) `redirect: 'error'` is not usable in the Workers runtime and made every GitHub call fail on the deployed Worker while mocked tests passed; fixed with `redirect: 'manual'` plus an explicit redirect error and a test. (2) GitHub's unauthenticated limit was exhausted from the shared Cloudflare egress during testing; the tools returned a clear rate-limit error with a retry hint, as designed.
 
-Production (2026-10-12): `orbit-thread-mcp` deployed to `https://mcp.orbit.convio.io/mcp`. DNS, TLS, `/health`, `initialize`, `tools/list`, input rejection, 403 foreign Origin and 405 GET passed. The three `tools/call` requests reached the Worker but returned the designed rate-limit error because GitHub's unauthenticated limit was exhausted for the shared egress IP, so a successful production tool result is not yet verified.
+Production (2026-10-12): `orbit-thread-mcp` serves `https://mcp.orbit.convio.io/mcp`. With GitHub quota available, `worker/scripts/e2e.mjs` passed all 23 checks against production: protocol/security (identity, three read-only tools, seven invalid-input rejections, 403/204/405/415/413/400, security headers) and functional (`get_project_next_actions` and `assess_release_readiness` on `shab1h-gh/orbit-thread`; `diagnose_ci_failure` on a genuine failed `cli/cli` run, found by search and then by explicit `run_id`, `rootCause: not determined`; missing repository; unknown run). After the token-aware redeploy GitHub's shared-egress quota was exhausted again; the script correctly exited 2 (`INCONCLUSIVE`) and the Worker returned the designed fast-fail error with a retry hint. Re-run when quota allows or after the owner sets `GITHUB_TOKEN`.
 
-Not verified: Codex native MCP loading of `plugin/.mcp.json` (no Codex CLI available), and authenticated GitHub behaviour (out of scope).
+Incident: the first `wrangler deploy --env staging` of this work moved the production Custom Domain to the staging Worker, because the staging environment inherited the top-level `routes`. Fixed with `"routes": []` in the staging environment; production was redeployed (with owner approval) and staging redeployed with no domain trigger afterwards. Always check a deploy's trigger list.
+
+Reliability and auth tests (`worker/test/auth.test.ts`, mocked): token sent only to `api.github.com`; malformed token ignored; 401 falls back to unauthenticated with a cooldown and no token in logs or output; exhausted quota fails fast and is tracked per auth mode; concurrency capped; private bodies never cached; `GITHUB_TOKEN` wired through the Worker and absent from results and headers; private repositories refused when authenticated. Scanner tests (`tests/scan-public.test.mjs`) cover the exact-hostname exception, lookalike hosts, `workers.dev` hosts, credentials and private paths.
+
+Compatibility: `plugin/plugin.json` and `plugin/mcp.json` validate against the official Agent Plugins 1.0.0 JSON Schemas (Ajv 2020-12, run from `worker/node_modules`); `claude plugin validate plugin --strict` and `. --strict` pass; with an isolated `CLAUDE_CONFIG_DIR`, a fresh install and a marketplace upgrade from v1.2.2 both end at 1.3.0 with three skills, and `claude mcp list` shows `orbit-next` Connected to production. ZIP builds are byte-identical across runs; ZIP and tarball scans are clean; `npm audit` reports 0 vulnerabilities.
+
+Not verified: Codex (no CLI; commands in [REVIEW.md](REVIEW.md)), Node 20 locally (CI matrix), production with a configured token (owner action), live invalid-token behaviour (mocked only).
 
 ### PR #7 repair (portable MCP packaging, Node 20 test glob)
 

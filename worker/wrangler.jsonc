@@ -12,6 +12,7 @@
     "staging": {
       "name": "orbit-thread-mcp-staging",
       "workers_dev": true,
+      "routes": [],
       "observability": { "enabled": false },
       "vars": { "ALLOWED_ORIGINS": "https://claude.ai,https://chatgpt.com" },
       "ratelimits": [{ "name": "LIMITER", "namespace_id": "7302", "simple": { "limit": 30, "period": 60 } }]

@@ -39,7 +39,7 @@ orbit-thread-1.2.2.tgz
 dist/orbit-thread-plugin-1.2.2.zip
 ```
 
-The npm tarball should contain 29 files (version 1.2.2, including `TERMS.md`, `lib/resume.mjs` and `plugin/skills/orbit-resume/`). The plugin ZIP should contain 17 files: the portable `plugin.json`, the three canonical skills, the listing icon and the licence, privacy, security and terms documents. Neither should contain tests, `dist/`, credentials or other build residue.
+The npm tarball should contain 36 files (version 1.3.0, including `docs/OPERATIONS.md`, `docs/REVIEW.md`, `TERMS.md`, `lib/resume.mjs` and `plugin/skills/orbit-resume/`). The plugin ZIP should contain 19 files: the portable `plugin.json`, `mcp.json`, `.mcp.json`, `.claude-plugin/plugin.json`, the three canonical skills, the listing icon and the licence, privacy, security and terms documents. Neither should contain tests, `dist/`, credentials or other build residue.
 
 Confirm all three canonical skills are present:
 

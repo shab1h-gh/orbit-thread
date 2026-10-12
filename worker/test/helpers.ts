@@ -1,4 +1,4 @@
-import { GitHubClient } from '../src/github.js';
+import { GitHubClient, resetGitHubState } from '../src/github.js';
 
 export const SHA = 'a'.repeat(40);
 export const OLD = 'b'.repeat(40);
@@ -10,6 +10,7 @@ export type Routes = Record<string, unknown | ((url: URL) => Response | unknown)
 
 /** Mock fetch for api.github.com and raw.githubusercontent.com. Records every request. */
 export function mockGitHub(routes: Routes) {
+  resetGitHubState(); // module-level quota memory must not leak between tests
   const calls: { url: string; method: string; headers: Headers }[] = [];
   const fetchImpl = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const u = new URL(typeof input === 'string' ? input : input instanceof URL ? input.href : input.url);

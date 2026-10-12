@@ -14,7 +14,7 @@ The optional **Orbit Next** MCP server (v1.3.0) is a separate, remote, read-only
 
 When you or your coding agent calls an Orbit Next tool, the request (tool name plus the `owner`, `repo` and optional `run_id` you supplied) is sent over HTTPS to a Cloudflare Worker. The Worker uses those values to fetch **public** data from GitHub's API and `raw.githubusercontent.com` and returns a summary to your agent.
 
-- **Not sent or readable:** local files, `HANDOFF-STATE.md`, uncommitted changes, private repositories, credentials or tokens. The service has no access to them.
+- **Not sent or readable:** local files, `HANDOFF-STATE.md`, uncommitted changes, private repositories or your credentials. The service has no access to them and accepts no credentials from you. If the operator configured the optional GitHub token, it is the operator's own read-only, public-repositories-only token; it is used to call GitHub, is not logged and is never returned to you.
 - **Not stored:** Orbit Next has no database, accounts or user storage and does not log request bodies. Public GitHub responses may be cached in Cloudflare's edge cache for up to five minutes; the cache holds public GitHub data only.
 - **Telemetry:** Orbit Next adds no analytics or tracking. Application observability/logging is disabled in the Worker configuration.
 - **Processors:** Cloudflare (hosting; handles network metadata such as IP addresses under its own policies, including for rate limiting) and GitHub (receives the requested repository paths from Cloudflare's network; it does not receive your identity). Your coding agent's provider also sees the tool results as part of your conversation.
