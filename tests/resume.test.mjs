@@ -7,17 +7,22 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const cli = fileURLToPath(new URL('../bin/orbit-thread.mjs', import.meta.url));
+const fixtureEnv = { ...process.env, TZ: 'UTC' };
+const fixtureCommitDate = '2026-10-10T12:00:00+00:00';
 function fixture(t) {
   const root = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'orbit resume '));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   spawnSync('git', ['init', '-q'], { cwd: root });
   return root;
 }
-function run(root, ...args) { return spawnSync(process.execPath, [cli, ...args], { cwd: root, encoding: 'utf8' }); }
+function run(root, ...args) { return spawnSync(process.execPath, [cli, ...args], { cwd: root, encoding: 'utf8', env: fixtureEnv }); }
 function commit(root, filename = 'tracked.txt') {
   fs.writeFileSync(path.join(root, filename), 'verified source\n');
   spawnSync('git', ['add', filename], { cwd: root });
-  return spawnSync('git', ['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'verified milestone'], { cwd: root });
+  return spawnSync('git', ['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.test', 'commit', '-qm', 'verified milestone'], {
+    cwd: root,
+    env: { ...fixtureEnv, GIT_AUTHOR_DATE: fixtureCommitDate, GIT_COMMITTER_DATE: fixtureCommitDate },
+  });
 }
 const handoff = (updated = '01-01-2020 10:00') => `# Handoff State\n\nUpdated: ${updated}\n\n## Current objective\n- Finish the sample feature.\n\n## Completed milestones\n- Added the base route.\n\n## In progress\n- Preserve the local edit.\n\n## Open issues / risks\n- Browser verification remains.\n\n## Immediate next steps\n1. Finish the handler.\n2. Run focused checks.\n\n## Verification\n- Unit suite passed.\n`;
 
