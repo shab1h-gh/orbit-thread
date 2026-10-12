@@ -290,3 +290,16 @@ Run on 12 October 2026, macOS, Node.js 24.16.0. v1.2.2 files are unchanged apart
 Findings during validation: (1) `redirect: 'error'` is not usable in the Workers runtime and made every GitHub call fail on the deployed Worker while mocked tests passed; fixed with `redirect: 'manual'` plus an explicit redirect error and a test. (2) GitHub's unauthenticated limit was exhausted from the shared Cloudflare egress during testing; the tools returned a clear rate-limit error with a retry hint, as designed.
 
 Not verified: a production endpoint (none exists), Codex native MCP loading of `plugin/.mcp.json` (no Codex CLI available), and authenticated GitHub behaviour (out of scope).
+
+### PR #7 repair (portable MCP packaging, Node 20 test glob)
+
+| Check | Result |
+| --- | --- |
+| `npm test` (59), `npm run validate`, `npm run scan:public` | pass; new tests cover the unquoted test glob and portable `mcp.json` / `plugin.json` rules |
+| Worker typecheck and tests (90) | pass |
+| `build:plugin`, `npm pack`, `smoke:pack` | pass; ZIP contains `plugin.json` (no `mcpServers`), `mcp.json`, `.mcp.json`, `.claude-plugin/plugin.json` |
+| `claude plugin validate --strict` (plugin and marketplace) | pass |
+| MCP connectivity | local `wrangler dev --env staging`: Streamable HTTP `initialize` and `tools/list` returned the three tools |
+| Node 20 | not run locally (`npx node@20` resolved to Node 24); covered by the CI matrix and a static regression test |
+
+Not verified: the production endpoint (undecided), Codex native loading of `mcp.json`.

@@ -40,4 +40,6 @@ MCP client ──HTTPS──▶ Worker /mcp ──GET──▶ api.github.com   
 
 ### Plugin wiring
 
-`plugin/.mcp.json` declares `orbit-next` (type `http`, URL from `ORBIT_NEXT_URL`). Both the portable `plugin.json` and `.claude-plugin/plugin.json` reference it via `mcpServers`.
+MCP packaging is split by client. `plugin/mcp.json` is the portable Agent Plugins 1.0 file (`$schema`, `streamable-http`, a literal HTTPS URL; discovered at the plugin root, never referenced from the portable `plugin.json`, which declares no `mcpServers`). `plugin/.mcp.json` is the Claude Code configuration (type `http`, URL `${ORBIT_NEXT_URL:-…}`), referenced only by `.claude-plugin/plugin.json`. Both point at the same placeholder (`orbit-next.invalid`) until the production endpoint is decided.
+
+Optional server-side GitHub authentication (not implemented): a Worker secret holding a read-only token would raise the GitHub rate limit for every caller without any client credentials; portable config must never carry tokens or headers with secrets. It needs a threat-model review (token scope, cache-key isolation, no echo in errors) before adoption.

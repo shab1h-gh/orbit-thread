@@ -10,7 +10,6 @@
   "homepage": "https://github.com/shab1h-gh/orbit-thread",
   "repository": "https://github.com/shab1h-gh/orbit-thread",
   "license": "MIT",
-  "mcpServers": "./.mcp.json",
   "keywords": [
     "handoff",
     "resume",

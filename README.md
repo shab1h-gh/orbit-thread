@@ -54,7 +54,7 @@ Agent:  (calls diagnose_ci_failure {"owner":"you","repo":"app"})
 
 ### Connect
 
-The plugin ships an MCP configuration (`plugin/.mcp.json`, server name `orbit-next`) that reads the endpoint from the `ORBIT_NEXT_URL` environment variable. **No public endpoint has been published yet** (see [Status](#status-and-costs)); until then run your own (below) and point at it:
+The plugin ships a portable MCP configuration (`plugin/mcp.json`) and a Claude Code one (`plugin/.mcp.json`), server name `orbit-next`; the Claude one reads the endpoint from the `ORBIT_NEXT_URL` environment variable. **No public endpoint has been published yet** (see [Status](#status-and-costs)); until then run your own (below) and point at it:
 
 ```bash
 export ORBIT_NEXT_URL="https://<your-worker-host>/mcp"

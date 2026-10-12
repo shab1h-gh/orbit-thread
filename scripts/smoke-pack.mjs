@@ -31,6 +31,7 @@ try {
   ok(run('--version'));
   assert.equal(fs.existsSync(path.join(prefix, 'node_modules/orbit-thread/worker')), false, 'worker/ must not ship in the npm package');
   assert.equal(fs.existsSync(path.join(prefix, 'node_modules/orbit-thread/plugin/.mcp.json')), true);
+  assert.equal(fs.existsSync(path.join(prefix, 'node_modules/orbit-thread/plugin/mcp.json')), true);
   assert.equal(run('--version').stdout.trim().endsWith(version), true);
   ok(run('install', '--agent', 'both', '--scope', 'project', '--yes'));
   ok(run('setup', '--agent', 'both', '--yes'));

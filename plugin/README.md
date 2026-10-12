@@ -25,6 +25,6 @@ Handoff is overwrite-only, capped at 50 lines, secret-checked before atomic repl
 
 ## Orbit Next (optional remote MCP)
 
-`.mcp.json` declares the `orbit-next` MCP server (Streamable HTTP, URL from `ORBIT_NEXT_URL`). Its three read-only tools inspect **public GitHub repositories**: `get_project_next_actions`, `diagnose_ci_failure` and `assess_release_readiness`. It is separate from the local skills: Resume reads only your local handoff and Git state, while Orbit Next fetches public GitHub metadata for an `owner/repo` you name. It needs no account, uses no AI inference and stores nothing. There is no telemetry.
+`mcp.json` (portable Agent Plugins 1.0, Streamable HTTP) and `.mcp.json` (Claude Code, URL from `ORBIT_NEXT_URL`) declare the `orbit-next` MCP server. Its three read-only tools inspect **public GitHub repositories**: `get_project_next_actions`, `diagnose_ci_failure` and `assess_release_readiness`. It is separate from the local skills: Resume reads only your local handoff and Git state, while Orbit Next fetches public GitHub metadata for an `owner/repo` you name. It needs no account, uses no AI inference and stores nothing. There is no telemetry.
 
 See the project README for installation, migration and update instructions.
