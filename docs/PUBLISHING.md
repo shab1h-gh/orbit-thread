@@ -2,7 +2,7 @@
 
 Orbit Thread v1.3.0 adds Orbit Next (an optional remote MCP server in `worker/`, never part of the npm package). It is released (tag `v1.3.0`, npm latest, production endpoint live) and has **not been submitted to provider directories**; see [SUBMISSION.md](SUBMISSION.md). Orbit Thread v1.2.2 was a documentation and metadata release that resolves OpenAI plugin submission findings (Terms of Service URL and conversation-starter length). It does not change skill behaviour. v1.2.1 was a compatibility patch for Orbit Resume; v1.2.0 added Resume, and the Orbit Thread line succeeded Orbit Handoff v1.0.x in v1.1.0.
 
-`orbit-thread@1.2.1` is already published; v1.2.2 is released. v1.3.0 is a new, unreleased version.
+`orbit-thread@1.2.1` is already published; v1.2.2 is released. v1.3.0 is also released (tag `v1.3.0`, npm latest).
 
 Historical `orbit-handoff@1.0.0`, `orbit-handoff@1.0.1`, `orbit-thread@1.1.0`, `orbit-thread@1.2.0` and `orbit-thread@1.2.1` releases are immutable. Do not republish, unpublish or move their release tags.
 

@@ -83,7 +83,7 @@ Also confirm no tool name exceeds 64 characters (they do not) and that the listi
 3. Record the demo video from the script and host it at an accessible URL.
 4. Approve the challenge-route deploy once OpenAI issues the token.
 5. Inspect Anthropic portal/Console, then submit connector and plugin bundle (or update the pending one).
-6. Optional: redeploy production for the rate-limit wording fix; review stray npm `0.0.0-stage`; Codex ZIP install test.
+6. Optional: review stray npm `0.0.0-stage`; Codex ZIP install test.
 7. Only advertise public availability after each dashboard shows published.
 
 Related: [REVIEW.md](REVIEW.md), [OPERATIONS.md](OPERATIONS.md), [PUBLISHING.md](PUBLISHING.md).
