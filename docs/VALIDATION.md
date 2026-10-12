@@ -177,3 +177,28 @@ Those native CLIs are not part of GitHub CI, so CI success does not claim those 
 
 OpenAI and Anthropic public-directory review is separate from npm/GitHub distribution. Their publisher dashboards are authoritative after submission; local validation does not imply approval.
 
+## Orbit Resume feature validation
+
+Validation completed on 11 October 2026 on the `feature/orbit-resume` branch.
+
+- All 43 automated tests passed, including Codex and Claude project installation,
+  reinstall, update, Doctor, missing/invalid/stale handoffs, branch changes,
+  future dates, terminal-control sanitisation, secret redaction, and preservation
+  of dirty working trees.
+- `npm run validate`, `npm run scan:public`, `npm run build:plugin`, and
+  `git diff --check` passed.
+- Claude Code `claude plugin validate ./plugin --strict` passed.
+- `npm pack` produced the expected 28-file v1.1.0 tarball, and
+  `npm run smoke:pack` passed against the packed CLI in a disposable project,
+  including `resume`, installation, setup, configure, Doctor, update, and
+  uninstall checks.
+- A security review identified a low-risk terminal-control injection through
+  branch metadata in a local handoff. Resume now strips terminal control
+  sequences from displayed repository and handoff text; the regression test
+  confirms those sequences do not reach terminal output.
+
+These are local pre-publication checks. The feature branch has not been merged
+or published to npm. Native skill discovery inside an authenticated Codex or
+Claude conversation was not exercised; manual `$orbit-resume`, `/orbit-resume`,
+and `/orbit-thread:orbit-resume` invocations remain the documented fallback.
+

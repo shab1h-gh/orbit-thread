@@ -14,7 +14,7 @@
   "repository": { "type": "git", "url": "git+https://github.com/shab1h-gh/orbit-thread.git" },
   "homepage": "https://github.com/shab1h-gh/orbit-thread#readme",
   "bugs": { "url": "https://github.com/shab1h-gh/orbit-thread/issues" },
-  "keywords": ["codex", "claude-code", "agent-skills", "continuity", "project-setup", "handoff", "context-efficiency"],
+  "keywords": ["codex", "claude-code", "agent-skills", "continuity", "project-setup", "handoff", "resume", "context-efficiency"],
   "files": ["bin/", "lib/", "plugin/", "docs/", "README.md", "LICENSE", "SECURITY.md", "PRIVACY.md", "CONTRIBUTING.md", "CHANGELOG.md"],
   "scripts": {
     "test": "node --test",

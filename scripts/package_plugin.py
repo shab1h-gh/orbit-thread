@@ -32,5 +32,6 @@ with zipfile.ZipFile(output) as archive:
     assert 'plugin.json' in names
     assert 'skills/handoff/SKILL.md' in names
     assert 'skills/orbit-setup/SKILL.md' in names
+    assert 'skills/orbit-resume/SKILL.md' in names
 
 print(f'Built dist/{output.name} ({output.stat().st_size} bytes)')

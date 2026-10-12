@@ -18,6 +18,7 @@ function run(root, ...args) { return spawnSync(process.execPath, [cli, ...args],
 function ok(result) { assert.equal(result.status, 0, result.stderr + result.stdout); }
 const read = (root, name) => fs.readFileSync(path.join(root, name), 'utf8');
 const location = (root, agent) => path.join(root, agent === 'codex' ? '.agents' : '.claude', 'skills/handoff');
+const resumeLocation = (root, agent) => path.join(root, agent === 'codex' ? '.agents' : '.claude', 'skills/orbit-resume');
 function assertSkill(dir) {
   for (const name of ['SKILL.md', 'agents/openai.yaml', 'scripts/write_handoff.sh']) assert.deepEqual(fs.readFileSync(path.join(dir, name)), fs.readFileSync(path.join(source, name)));
 }
@@ -28,12 +29,14 @@ for (const agent of ['codex', 'claude', 'both']) {
     const selected = agent === 'both' ? ['codex', 'claude'] : [agent];
     ok(run(root, 'install', '--agent', agent, '--yes'));
     selected.forEach(a => assertSkill(location(root, a)));
+    selected.forEach(a => assert.equal(fs.existsSync(path.join(resumeLocation(root, a), 'SKILL.md')), true));
     ok(run(root, 'install', '--agent', agent, '--yes'));
     ok(run(root, 'check', '--agent', agent));
     selected.forEach(a => fs.writeFileSync(path.join(location(root, a), 'personal-note.md'), 'keep me'));
     selected.forEach(a => fs.mkdirSync(path.join(location(root, a), 'personal-empty-folder')));
     ok(run(root, 'update', '--agent', agent, '--yes'));
     selected.forEach(a => assertSkill(location(root, a)));
+    selected.forEach(a => assert.equal(fs.existsSync(path.join(resumeLocation(root, a), 'SKILL.md')), true));
     ok(run(root, 'uninstall', '--agent', agent, '--yes'));
     selected.forEach(a => {
       assert.equal(read(location(root, a), 'personal-note.md'), 'keep me');
@@ -49,6 +52,18 @@ test('Codex and Claude copies including ownership metadata are byte-identical', 
   const root = fixture(t);
   ok(run(root, 'install', '--yes'));
   for (const name of ['SKILL.md', 'agents/openai.yaml', 'scripts/write_handoff.sh', '.orbit-thread.json']) assert.deepEqual(fs.readFileSync(path.join(location(root, 'codex'), name)), fs.readFileSync(path.join(location(root, 'claude'), name)));
+  for (const name of ['SKILL.md', 'agents/openai.yaml', '.orbit-thread.json']) assert.deepEqual(fs.readFileSync(path.join(resumeLocation(root, 'codex'), name)), fs.readFileSync(path.join(resumeLocation(root, 'claude'), name)));
+});
+
+test('doctor requires the Resume skill for configured agents', t => {
+  const root = fixture(t);
+  ok(run(root, 'install', '--agent', 'both', '--yes'));
+  ok(run(root, 'setup', '--agent', 'both', '--yes'));
+  ok(run(root, 'doctor', '--agent', 'both'));
+  fs.rmSync(resumeLocation(root, 'claude'), { recursive: true });
+  assert.equal(run(root, 'doctor', '--agent', 'both').status, 1);
+  ok(run(root, 'update', '--agent', 'both', '--yes'));
+  assert.equal(fs.existsSync(path.join(resumeLocation(root, 'claude'), 'SKILL.md')), true);
 });
 
 test('init preserves existing content, adds a single block, ignores only intended state, and uninstall restores bytes', t => {

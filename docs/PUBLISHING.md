@@ -37,11 +37,12 @@ orbit-thread-1.1.0.tgz
 dist/orbit-thread-plugin-1.1.0.zip
 ```
 
-Confirm both canonical skills are present:
+Confirm all three canonical skills are present:
 
 ```text
 plugin/skills/handoff/
 plugin/skills/orbit-setup/
+plugin/skills/orbit-resume/
 ```
 
 and that the packed CLI can install, setup, configure, doctor, update and uninstall in a disposable repository.

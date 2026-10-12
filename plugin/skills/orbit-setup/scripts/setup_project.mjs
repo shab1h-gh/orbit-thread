@@ -28,8 +28,9 @@ const agentsBlock = config => `${begin}
 - Inspect only source files needed for the task. Do not broadly scan generated, vendor, dependency, build, coverage or cache directories, and do not reread unchanged context without a reason.
 - Living docs describe CURRENT truth. After verified work changes that truth, update affected existing sections in place during the same milestone. Never append session diaries or duplicate superseded sections; Git is history. Never rewrite an applied migration.
 - Run the smallest relevant verification before claiming a milestone or task complete. Never claim a test, deployment, commit, push or external action that did not run.
+- Start each new coding task in a fresh chat and invoke \`$orbit-resume\` once at session start. Do this automatically where the host supports it; otherwise the reliable fallback is to invoke it manually. Do not repeat Resume in the same session unless the user asks for a fresh recovery.
 - Run the installed \`handoff\` skill after a meaningful verified milestone that changed repository state or durable project truth, and after each completed coding task with such changes before the final reply. Also checkpoint before \`/clear\`, session end, or a usage/context stop when warning is available. Skip read-only questions and trivial edits. Intermediate checkpoints must not stop unfinished work.
-- Each checkpoint overwrites \`HANDOFF-STATE.md\`. After a fresh/cleared/recovered session: read the handoff once if present, inspect branch/status/diff/recent log, read only relevant living docs, then inspect only source needed for the exact next action. Do not reconstruct old conversation history or repeat completed work.
+- Each checkpoint overwrites \`HANDOFF-STATE.md\`. Resume reads the handoff once if present, checks current Git state, then reads only task-relevant living docs and source. Do not reconstruct old conversation history or repeat completed work.
 ${renderSubagentBlock(config)}
 - Read-only Git inspection is allowed. Commit, push, merge, rebase, reset, branch deletion or other Git writes require explicit authority in the current request. Never force-push or destructively clean without explicit authority.
 - Never place secrets, credentials, environment values, private keys, recovery codes, personal data or sensitive production data in living docs or \`HANDOFF-STATE.md\`.
@@ -39,7 +40,7 @@ ${end}
 const claudeBlock = `${begin}
 ## Orbit Thread
 
-Read and follow \`AGENTS.md\` for project workflow, selective context loading, subagents and checkpoints. On a fresh or recovered session, resume from \`HANDOFF-STATE.md\` + current Git state + only the relevant living docs instead of reconstructing old conversation history.
+Read and follow \`AGENTS.md\` for project workflow, selective context loading, subagents and checkpoints. Start each new coding task in a fresh chat and invoke \`/orbit-resume\` once at session start, automatically where supported. If automatic invocation is unavailable, manually run \`/orbit-resume\` (or \`/orbit-thread:orbit-resume\` from the marketplace plugin). Do not repeat Resume in the same session unless the user asks for a fresh recovery.
 ${end}
 `;
 const templates = {

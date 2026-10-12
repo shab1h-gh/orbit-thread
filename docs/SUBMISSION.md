@@ -18,7 +18,7 @@ Build it with:
 npm run build:plugin
 ```
 
-The ZIP contains portable `plugin.json`, both canonical skills, OpenAI interface metadata, the Orbit Setup onboarding skill, listing icon and compatibility metadata. Orbit Thread needs no MCP server or external account.
+The ZIP contains portable `plugin.json`, all three canonical skills, OpenAI interface metadata, the Orbit Setup onboarding skill, listing icon and compatibility metadata. Orbit Thread needs no MCP server or external account.
 
 ### Submission flow
 

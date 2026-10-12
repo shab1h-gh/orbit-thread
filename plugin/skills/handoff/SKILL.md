@@ -41,6 +41,7 @@ Omit empty sections. Aim for about 30 lines; hard cap 50. State each fact once. 
 - Evidence only. Never claim a test, deployment, commit, push or external action happened without evidence.
 - Never include secrets, credentials, tokens, private keys, recovery codes, `.env`/`.dev.vars` values, personal data or sensitive production data.
 - Do not record the current HEAD SHA; it becomes stale easily. Exact SHAs are allowed only for immutable earlier revisions such as releases, deployments or rollback points.
+- When Git is available, record the current branch as `Branch: <name>` under `Current state` so a later Resume can detect a branch change. Never record the current HEAD SHA.
 - `HANDOFF-STATE.md` is local current state, intended to be Git-ignored. Never append history or make committing it a next step.
 - Durable product, design, architecture, security or roadmap truth belongs in tracked living docs. Handoff does not replace those files.
 - At an intermediate checkpoint, do not stop merely because the handoff was written.
