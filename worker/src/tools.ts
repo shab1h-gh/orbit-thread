@@ -20,7 +20,7 @@ const fail = (message: string): CallToolResult => ({ isError: true, content: [{ 
 export function toErrorResult(e: unknown): CallToolResult {
   if (e instanceof InputError) return fail(e.message);
   if (e instanceof GitHubError) {
-    if (e.kind === 'rate_limited') return fail(`${e.message} Orbit Next uses GitHub's unauthenticated API; try again later.`);
+    if (e.kind === 'rate_limited') return fail(`${e.message} Try again later.`);
     return fail(`GitHub request failed: ${e.message}`);
   }
   return fail('Unexpected internal error.');
