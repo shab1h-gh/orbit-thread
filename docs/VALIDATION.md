@@ -56,7 +56,7 @@ verification on 5 October 2026 confirmed version 1.0.0, `latest` resolving to
 to `shab1h-gh/orbit-handoff`. The previous failed publication attempt is stale
 history; the registry package is available.
 
-Neither OpenAI nor Anthropic public directory submission has been made.
+This repository does not record live directory-review state; the provider dashboards are authoritative (see [SUBMISSION.md](SUBMISSION.md)).
 Provider review, identity verification and portal checks remain publisher steps.
 Native Windows, WSL-specific operation and ordinary ChatGPT execution are
 unverified; the supported runtime is macOS/Linux with a POSIX shell.
